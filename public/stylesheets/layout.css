@@ -10,11 +10,13 @@ body {
     background-color:black !important;
 }
 main{
-
     width:100%;
-    max-width: 960px;
+    max-width: 660px;
     height:100%;
     background-color:white;
+    display:flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 a {
