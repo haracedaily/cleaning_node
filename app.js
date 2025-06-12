@@ -4,7 +4,6 @@ const path = require('path');
 const nunjucks = require('nunjucks');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
-const expressSession = require('express-session');
 const cors = require('cors');
 require('dotenv').config();
 
@@ -15,18 +14,6 @@ app.use(morgan("dev"));
 app.use(express.json(), express.urlencoded({ extended: false }));
 app.use("/", express.static(path.join(__dirname, "public")));
 app.use(cookieParser(process.env.COOKIE_SECRET));
-app.use(
-    expressSession({
-        secret: process.env.COOKIE_SECRET,
-        resave: false,
-        saveUninitialized: false,
-        cookie: {
-            httpOnly: false,
-            secure: false,
-        },
-        name: "session-cookie",
-    })
-);
 app.set("port", 4020);
 app.set("view engine", "html");
 nunjucks.configure("views", {
@@ -39,7 +26,7 @@ app.use("/res",resRouter);
 app.use("/gisa", gisaRouter);*/
 
 app.get('/', function (req, res) {
-    res.render('index');
+    res.render('index',{title: 'ICECARE', request: req});
 })
 
 /* 미들웨어 장착 끝 */
