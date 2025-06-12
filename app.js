@@ -20,13 +20,12 @@ nunjucks.configure("views", {
     express: app,
     watch: true,
 });
-/*const resRouter = require('./routes/resRouter.js');
-const gisaRouter = require('./routes/gisaRouter.js');
-app.use("/res",resRouter);
-app.use("/gisa", gisaRouter);*/
+const gisaRouter = require('./routes/gisa');
+app.use("/gisa", gisaRouter);
+
 
 app.get('/', function (req, res) {
-    res.render('index',{title: 'ICECARE', request: req});
+    res.render('login',{title: 'ICECARE', request: req});
 })
 
 /* 미들웨어 장착 끝 */
