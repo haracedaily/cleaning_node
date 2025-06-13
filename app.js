@@ -21,11 +21,15 @@ nunjucks.configure("views", {
     watch: true,
 });
 const gisaRouter = require('./routes/gisa');
+const signupRouter = require('./routes/signup');
+const agreeRouter = require('./routes/agree');
 app.use("/gisa", gisaRouter);
+app.use("/signup", signupRouter);
+app.use('/agree', agreeRouter);
 
 
 app.get('/', function (req, res) {
-    res.render('login',{title: 'ICECARE', request: req});
+    res.render('login',{title: '로그인', request: req});
 })
 
 /* 미들웨어 장착 끝 */

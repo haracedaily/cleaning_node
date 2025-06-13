@@ -1,38 +1,122 @@
 body {
-    padding:0;
-    margin:0;
+    padding: 0;
+    margin: 0;
     font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
     width: 100%;
-    background-color:black !important;
+    background-color: #f8f9fa !important;
 }
-main{
-    width:100%;
+
+main {
+    width: 100%;
     max-width: 660px;
-    height:100%;
-    background-color:white;
-    display:flex;
+    height: 100vh;
+    background-color: white;
+    display: flex;
     flex-direction: column;
     align-items: center;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
 }
 
 a {
     color: #00B7FF;
+    text-decoration: none;
 }
 
-.bi-bell .new-order{
+.new-order {
     position: relative;
-    &::after{
-        content: "";
-        position: absolute;
-        top: 6px;
-        right: 0;
-        background-color: red;
-        padding: 3px 3px;
-        border-radius: 50%;
-        font-size: 12px;
+}
+
+.new-order::after {
+    content: "";
+    position: absolute;
+    top: 6px;
+    right: 0;
+    background-color: red;
+    padding: 3px 3px;
+    border-radius: 50%;
+    font-size: 12px;
+}
+
+/* 공통 스타일 */
+.card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    margin-bottom: 1rem;
+}
+
+.btn {
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-weight: 500;
+}
+
+.btn-primary {
+    background-color: #0084FF;
+    border-color: #0084FF;
+}
+
+.btn-primary:hover {
+    background-color: #0066CC;
+    border-color: #0066CC;
+}
+
+/* 네비게이션 스타일 */
+.nav-underline {
+    border-bottom: 1px solid #e9ecef;
+}
+
+.nav-underline .nav-link {
+    color: #6c757d;
+    padding: 0.8rem 0;
+    font-weight: 500;
+}
+
+.nav-underline .nav-link.active {
+    color: #0084FF;
+    border-bottom: 2px solid #0084FF;
+}
+@media screen and (min-width: 768px) {
+
+    
+    main {
+        border-radius: 20px;
+        min-height: calc(100vh - 40px);
+    }
+}
+
+
+/* 반응형 폰트 크기 */
+@media screen and (max-width: 768px) {
+    body {
+        font-size: 14px;
+    }
+
+    .card-title {
+        font-size: 1.1rem;
+    }
+
+    .card-text {
+        font-size: 0.9rem;
+    }
+}
+
+@media screen and (min-width: 769px) {
+    body {
+        font-size: 16px;
+    }
+
+    .card-title {
+        font-size: 1.25rem;
+    }
+
+    .card-text {
+        font-size: 1rem;
     }
 }

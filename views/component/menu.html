@@ -1,0 +1,54 @@
+<ul class="nav nav-underline row justify-content-center flex-row border-bottom m-0 mb-3 w-100 text-center" style="white-space: nowrap; background-color: white;">
+    <li class="nav-item col-2">
+        {% if request.originalUrl === '/gisa' %}
+        <a class="nav-link active" aria-current="page" href="/gisa">
+            <i class="bi bi-calendar-check d-block mb-1" style="font-size: 1.2rem;"></i>
+            <span style="font-size: 0.9rem;">오늘</span>
+        </a>
+        {% else %}
+        <a class="nav-link" href="/gisa">
+            <i class="bi bi-calendar-check d-block mb-1" style="font-size: 1.2rem;"></i>
+            <span style="font-size: 0.9rem;">오늘</span>
+        </a>
+        {% endif %}
+    </li>
+    <li class="nav-item col-2">
+        {% if '/gisa/order' in request.originalUrl %}
+        <a class="nav-link active" aria-current="page" href="/gisa/order">
+            <i class="bi bi-list-check d-block mb-1" style="font-size: 1.2rem;"></i>
+            <span style="font-size: 0.9rem;">오더</span>
+        </a>
+        {% else %}
+        <a class="nav-link" href="/gisa/order">
+            <i class="bi bi-list-check d-block mb-1" style="font-size: 1.2rem;"></i>
+            <span style="font-size: 0.9rem;">오더</span>
+        </a>
+        {% endif %}
+    </li>
+    <li class="nav-item col-2">
+        {% if '/gisa/payment' in request.originalUrl %}
+        <a class="nav-link active" aria-current="page" href="/gisa/payment">
+            <i class="bi bi-wallet2 d-block mb-1" style="font-size: 1.2rem;"></i>
+            <span style="font-size: 0.9rem;">정산</span>
+        </a>
+        {% else %}
+        <a class="nav-link" href="/gisa/payment">
+            <i class="bi bi-wallet2 d-block mb-1" style="font-size: 1.2rem;"></i>
+            <span style="font-size: 0.9rem;">정산</span>
+        </a>
+        {% endif %}
+    </li>
+    <li class="nav-item col-2">
+        {% if '/gisa/history' in request.originalUrl %}
+        <a class="nav-link active" aria-current="page" href="/gisa/history">
+            <i class="bi bi-clock-history d-block mb-1" style="font-size: 1.2rem;"></i>
+            <span style="font-size: 0.9rem;">이력</span>
+        </a>
+        {% else %}
+        <a class="nav-link" href="/gisa/history">
+            <i class="bi bi-clock-history d-block mb-1" style="font-size: 1.2rem;"></i>
+            <span style="font-size: 0.9rem;">이력</span>
+        </a>
+        {% endif %}
+    </li>
+</ul>
