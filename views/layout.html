@@ -16,8 +16,8 @@
 <body>
 <main>
     {% if request.originalUrl !== '/profile' %}
-    {% include './card.html' %}
-    {% include './menu.html' %}
+    {% include './component/card.html' %}
+    {% include './component/menu.html' %}
     {% endif %}
     {% block content %}
     {% endblock %}
