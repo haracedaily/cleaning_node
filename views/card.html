@@ -1,11 +1,11 @@
 <div class="card" style="width: 95%; margin: 0 auto">
     <div class="card-body d-flex flex-row justify-content-end">
         {% if request.originalUrl === '/profile' %}
-        <i class="bi bi-bell new-order" style="font-size: min(10vw,2rem); color: cornflowerblue;"></i>
+        <i class="bi bi-bell new-order" style="font-size: min(10vw,2rem); color: cornflowerblue; cursor:pointer;" onclick="location.href='/gisa/order'"></i>
         {% else %}
-        <i class="bi bi-bell" style="font-size: min(10vw,2rem); color: cornflowerblue;"></i>
+        <i class="bi bi-bell" style="font-size: min(10vw,2rem); color: cornflowerblue; cursor:pointer;" onclick="location.href='/gisa/order'"></i>
         {% endif %}
-        <i class="bi bi-person" style="font-size: min(10vw,2rem); color: cornflowerblue;"></i>
+        <i class="bi bi-person" style="font-size: min(10vw,2rem); color: cornflowerblue; cursor:pointer;" onclick="location.href='/';"></i>
     </div>
     <div class="card-body" style="box-shadow: 0 3px 2px -1px #0088ff;">
         <div class="d-flex flex-row justify-content-between">

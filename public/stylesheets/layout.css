@@ -22,3 +22,17 @@ main{
 a {
     color: #00B7FF;
 }
+
+.bi-bell .new-order{
+    position: relative;
+    &::after{
+        content: "";
+        position: absolute;
+        top: 6px;
+        right: 0;
+        background-color: red;
+        padding: 3px 3px;
+        border-radius: 50%;
+        font-size: 12px;
+    }
+}
