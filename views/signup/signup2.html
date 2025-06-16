@@ -10,6 +10,17 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
+    <style>
+        #emailForm{
+            position:relative;
+            &:after{
+            position:absolute;
+            content: attr(data-repeat);
+            bottom:-1rem;
+                color: var(--repeat-check-color);
+            }
+        }
+    </style>
 </head>
 <body>
 <main style="position:relative; padding: 1rem;">
@@ -19,13 +30,54 @@
         <h1 style="font-size:35pt; font-weight:900; color:#0084FF;">ICE <strong style="color:#BCDEFF">CARE</strong></h1>
         <h1 style="font-weight:600;">로그인에 사용할</h1>
         <h1 style="font-weight:600;">이메일을 입력해주세요</h1>
+        <form id="emailForm" data-repeat="" data-color="red" style="width: 100%; display: flex; gap: 1rem; padding: 1rem;">
+            <div class="form-floating" style="width: 90%;">
+                {% if request.session.email %}
+                <input style="background-color:rgba(255,255,255,0.7);" type="email" class="form-control" id="email" name="email" placeholder="name@example.com" value="{{request.session.email}}" onchange="changeEmail()">
+                <label for="email">이메일</label>
+                {% else %}
+                <input style="background-color:rgba(255,255,255,0.7);" type="email" class="form-control" id="email" name="email" placeholder="name@example.com" onchange="changeEmail()">
+                <label for="email">이메일</label>
+                {% endif %}
+            </div>
+            <button type="submit" class="btn btn-primary" style="white-space:nowrap;">확인</button>
+        </form>
     </div>
-    <button class="btn btn-primary" onclick="location.href='/signup/3'">다음으로</button>
+    <button class="btn btn-primary" onclick="nextPage()">다음으로</button>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        const emailForm = document.getElementById('emailForm');
+        emailForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value.trim();
+            const regEmail = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
+
+            if(!regEmail.test(email)) {
+                alert('이메일 형식에 따라 정확히 입력해주세요');
+                return;
+            }
+
+            axios.post('/signup/email', { email })
+                .then(response => {
+                    console.log(response);
+                    if (response.data.success) {
+                        emailForm.dataset.repeat = '사용 가능한 이메일입니다.';
+                        emailForm.style.setProperty('--repeat-check-color', 'green');
+
+                    } else {
+                        emailForm.dataset.repeat = '이미 등록된 이메일입니다.';
+                        emailForm.style.setProperty('--repeat-check-color', 'red');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('오류가 발생했습니다. 다시 시도해주세요.');
+                });
+
+        })
         history.pushState(null, '', location.href);
         window.addEventListener('popstate', function (event) {
             console.log(event);
@@ -36,7 +88,25 @@
                 history.pushState(null, '', location.href); // 뒤로가기 막기
             }
         });
+
+
     });
+    function changeEmail() {
+        document.getElementById('emailForm').dataset.repeat = '';
+    }
+    function nextPage() {
+        const email = document.getElementById('email').value.trim();
+        const regEmail = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
+        if(!regEmail.test(email)) {
+            alert('이메일 형식에 따라 정확히 입력해주세요');
+            return;
+        }
+        if (emailForm.dataset.repeat !== '사용 가능한 이메일입니다.') {
+            alert('이메일 중복 확인을 해주세요.');
+            return;
+        }
+        window.location.href = '/signup/email?email=' + encodeURIComponent(email);
+    }
 </script>
 </body>
 </html>

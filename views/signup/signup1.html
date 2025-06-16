@@ -253,11 +253,28 @@
             <div class="p-toast-container p-toast-container--top"></div>
             <div class="p-toast-container p-toast-container--bottom"></div>
         </div>
-        <button class="btn btn-primary" id="agreeAllBtn">모두 동의(선택 정보 포함)</button>
+        <button class="btn btn-primary" id="agreeAllBtn">모두 동의</button>
     </div>
-    <button class="btn btn-primary" onclick="location.href='/signup/2'">동의 후 가입하기</button>
+    <button class="btn btn-primary" onclick="nextPage()">동의 후 가입하기</button>
 </main>
+<script>
+    function nextPage() {
+        const mainCheckbox = document.getElementById('checkable-:r6:');
+        const subCheckboxes = document.querySelectorAll('.sub-checkbox');
 
+        if (!mainCheckbox.checked) {
+            alert('모든 약관에 동의해주세요.');
+            return;
+        }
+
+        if (Array.from(subCheckboxes).some(checkbox => !checkbox.checked)) {
+            alert('모든 서브 약관에 동의해주세요.');
+            return;
+        }
+
+        location.href = '/signup/2';
+    }
+</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
 </body>
 </html>
