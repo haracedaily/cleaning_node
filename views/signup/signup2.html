@@ -24,5 +24,19 @@
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        history.pushState(null, '', location.href);
+        window.addEventListener('popstate', function (event) {
+            console.log(event);
+            const confirmLeave = confirm('뒤로 가시면 작성한 내용이 저장되지 않습니다. 정말로 뒤로 가시겠습니까?');
+            if (confirmLeave) {
+                window.location.href = '/';
+            } else {
+                history.pushState(null, '', location.href); // 뒤로가기 막기
+            }
+        });
+    });
+</script>
 </body>
 </html>

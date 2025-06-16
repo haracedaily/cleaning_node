@@ -219,8 +219,7 @@
                     // 서브 체크박스 이벤트
                     subCheckboxes.forEach(checkbox => {
                         checkbox.addEventListener('change', function() {
-                            const allChecked = Array.from(subCheckboxes).every(cb => cb.checked);
-                            mainCheckbox.checked = allChecked;
+                            mainCheckbox.checked = Array.from(subCheckboxes).every(cb => cb.checked);
                         });
                     });
 
@@ -233,6 +232,17 @@
                         } else {
                             subTerms.style.display = 'none';
                             this.setAttribute('aria-expanded', 'false');
+                        }
+                    });
+
+                    history.pushState(null, '', location.href);
+                    window.addEventListener('popstate', function (event) {
+                        console.log(event);
+                        const confirmLeave = confirm('뒤로 가시면 동의한 내용이 저장되지 않습니다. 정말로 뒤로 가시겠습니까?');
+                        if (confirmLeave) {
+                            window.location.href = '/';
+                        } else {
+                            history.pushState(null, '', location.href); // 뒤로가기 막기
                         }
                     });
                 });
