@@ -4,6 +4,7 @@ const path = require('path');
 const nunjucks = require('nunjucks');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
+const expressSession = require('express-session');
 const cors = require('cors');
 require('dotenv').config();
 
@@ -14,6 +15,17 @@ app.use(morgan("dev"));
 app.use(express.json(), express.urlencoded({ extended: false }));
 app.use("/", express.static(path.join(__dirname, "public")));
 app.use(cookieParser(process.env.COOKIE_SECRET));
+app.use(expressSession({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: false, // HTTPS를 사용할 때 true로 설정
+        maxAge: 1000 * 60 * 60 * 24, // 쿠키 유효기간 1일
+        httpOnly: true // 클라이언트 측 스크립트에서 쿠키 접근 방지
+    },
+    name: "session-cookie", // 쿠키 이름 설정
+}));
 app.set("port", 4020);
 app.set("view engine", "html");
 nunjucks.configure("views", {
