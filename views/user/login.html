@@ -15,7 +15,7 @@
     <main style="background-image: url('/login_background.png'); background-size: cover; background-repeat: no-repeat; background-position: bottom center; filter:saturate(0.8);">
         <div style="width:100%; height:100%; display: flex; flex-direction:column; justify-content: space-around; align-items: center; gap:0.5rem;">
         <h1 style="font-weight:bolder; color:white;">ICE <strong style="color:#BCDEFF">CARE</strong></h1>
-            <div style="width:100%; display: flex; flex-direction:column; justify-content: flex-end; align-items: center; gap:0.5rem;">
+            <div style="width:100%; display: flex; flex-direction:column; justify-content: flex-end; align-items: center; gap:0.5rem;" >
                 <strong>초기비밀번호는 연락처(숫자'만')입니다.</strong>
                     <div style="width:70%;">
                         <div class="form-floating">
@@ -29,29 +29,52 @@
                             <label for="pw">비밀번호</label>
                         </div>
                     </div>
-
-                <!--
-                <div class="form-floating mb-3">
-                    <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
-                    <label for="floatingInput">Email address</label>
-                </div>
-                <div class="form-floating">
-                    <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
-                    <label for="floatingPassword">Password</label>
-                </div>
-                -->
                 <div class="d-flex justify-content-start align-items-center" style="width:70%; gap:0.5rem;">
-                <input type="checkbox" id="autoLogin" style="width: 1.5rem; height: 1.5rem;" />
+                <input type="checkbox" id="autoLogin" style="width: 1.5rem; height: 1.5rem;" checked />
                 <label for="autoLogin">자동 로그인</label>
                 </div>
                <!-- <input type="text" class="form-control" style="background-color:rgba(255,255,255,0.7); width:70%;" placeholder="아이디" id="userId">
                 <input type="password" class="form-control" style="background-color:rgba(255,255,255,0.7); width:70%;" placeholder="비밀번호" id="userPw">-->
-                <button class="btn btn-primary" style="width:70%; padding:1rem .75rem;" id="loginBtn" onclick="location.href='/gisa';">로그인</button>
-                <button class="btn btn-secondary" style="width:70%; padding:1rem .75rem;" id="registerBtn" onclick="location.href='/signup/1'">회원가입</button>
+                <button class="btn btn-primary" style="width:70%; padding:1rem .75rem;" id="loginBtn" >로그인</button>
+                <input type="button" class="btn btn-secondary" style="width:70%; padding:1rem .75rem;" id="registerBtn" onclick="location.href='/signup/1'" value="회원가입" />
             </div>
         </div>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
+    <script>
+        const $pw = document.getElementById('pw');
+        const $id = document.getElementById('id');
+        document.getElementById('loginBtn').addEventListener("click", () => {
+
+            const id = $id.value.trim();
+            const pw = $pw.value.trim();
+            console.log(id);
+            console.log(pw);
+            if (!id || !pw) {
+                alert('아이디와 비밀번호를 입력해주세요.');
+                return;
+            }
+
+            axios.post('/user/login', {
+                id: id,
+                pw: pw,
+                autoLogin: document.getElementById('autoLogin').checked
+            })
+            .then(response => {
+                console.log(response);
+                if (response.status === 200) {
+                    alert('로그인 성공');
+                    location.href = '/gisa';
+                } else {
+                    alert(response.data.message || '로그인 실패');
+                }
+            })
+            .catch(error => {
+                console.error('로그인 중 오류 발생:', error);
+                alert('로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
+            });
+        });
+    </script>
 </body>
 </html>

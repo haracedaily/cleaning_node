@@ -1,0 +1,64 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container">
+<h5>예약 현황</h5>
+    {% for reservation in reservations %}
+    <div class="res-card">
+        <div class="res-row">
+            <span class="res-label">예약자</span>
+            <span class="res-value">{{ reservation.user.username }}</span>
+            <button class="res-btn" onclick="pickup({{reservation.res_no}})">청소배정</button>
+        </div>
+        <div class="res-row">
+            <span class="res-label">예약일</span>
+            <span class="res-value">{{ reservation.date.slice(0,10) }}</span>
+        </div>
+        <div class="res-row">
+            <span class="res-label">시간</span>
+            <span class="res-value">{{ reservation.time }}</span>
+        </div>
+        <div class="res-row">
+            <span class="res-label">모델</span>
+            <span class="res-value">{{ reservation.model }}</span>
+        </div>
+        <div class="res-row">
+            <span class="res-label">요청</span>
+            <span class="res-value">{{ reservation.remark }}</span>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+function pickup(res_no) {
+ /*   if (confirm("청소를 배정하시겠습니까?")) {
+        fetch(`/reservation/pickup/${res_no}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("청소가 배정되었습니다.");
+                location.reload();
+            } else {
+                alert("배정에 실패했습니다. 다시 시도해주세요.");
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }*/
+}
+</script>
+{% endblock %}
+
+{% block style %}
+<style>
+
+</style>
+{% endblock %}

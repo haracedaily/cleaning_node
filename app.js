@@ -10,7 +10,11 @@ require('dotenv').config();
 
 const app = express();
 
-app.use(cors()); // CORS 설정
+app.use(cors({
+    // origin: "https://port-0-cleaning-node-managdgo41797b84.sel4.cloudtype.app", // CORS 허용할 도메인
+    credentials: true, // 쿠키를 포함한 요청을 허용
+    methods: ["GET", "POST", "PUT", "DELETE"], // 허용할 HTTP 메소드
+})); // CORS 설정
 app.use(morgan("dev"));
 app.use(express.json(), express.urlencoded({ extended: false }));
 app.use("/", express.static(path.join(__dirname, "public")));
@@ -35,17 +39,25 @@ nunjucks.configure("views", {
 const gisaRouter = require('./routes/gisa');
 const signupRouter = require('./routes/signup');
 const agreeRouter = require('./routes/agree');
+const userRouter = require('./routes/user');
+
 app.use("/gisa", gisaRouter);
 app.use("/signup", signupRouter);
 app.use('/agree', agreeRouter);
-
+app.use('/user', userRouter);
 
 app.get('/', function (req, res) {
-    res.render('login',{title: '로그인', request: req});
+    console.log('초기 페이지 : ', req.session);
+    if(req.session.user) {
+        // 로그인 상태
+        res.render('today',{title: 'ICECARE', request: req});
+    }else
+    res.render('user/login',{title: '로그인', request: req});
 })
 
 /* 미들웨어 장착 끝 */
 app.use((req,res,next)=>{
+    console.log(req.originalUrl);
     console.log('해당하는 라우터가 없다');
     const error = new Error('해당하는 페이지가 없습니다.');
     next(error); // 에러 미들웨어로 가라

@@ -10,14 +10,14 @@
     <div class="card-body" style="box-shadow: 0 3px 2px -1px rgba(0,136,255,0.2);">
         <div class="d-flex flex-row justify-content-between align-items-center">
             <p class="card-text mb-0">수령금액</p>
-            <button class="btn btn-light border text-primary">정산내역</button>
+            <button class="btn btn-light border text-primary" onclick="location.href='/gisa/reservation'">예약목록</button>
         </div>
         <h5 class="card-title mt-2" style="color: #0084FF; font-weight: bold;">0 원</h5>
     </div>
     <div class="card-body">
         <div class="d-flex flex-row justify-content-between align-items-center">
             <div class="d-flex flex-column">
-                <h5 class="card-title mb-1">OOO기사님,</h5>
+                <h5 class="card-title mb-1">{{request.session.user.nm}}기사님,</h5>
                 <h5 class="card-title mb-2">오늘 하루도 청결!</h5>
                 <p class="card-text mb-2">오늘의 목표</p>
                 <div class="inner-card-value"></div>

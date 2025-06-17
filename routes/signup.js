@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const supabase = require('../utils/supa.js');
+const {supa,service} = require('../utils/supa.js');
 const bcrypt = require('bcryptjs');
 
 router.get('/1', function (req, res) {
@@ -15,7 +15,7 @@ router.get('/2', function (req, res) {
 router.get('/3', async function (req, res) {
     console.log("회원가입 3");
     console.log(req.session.email);
-    const result = await supabase.from('bank').select('*');
+    const result = await supa.from('bank').select('*');
     res.render('signup/signup3', { title: '회원가입', request: req, email: req.session.email, bank:result.data });
 })
 
@@ -23,11 +23,16 @@ router.post('/3', async function (req, res) {
     console.log("회원가입 3 post");
     console.log(req.body);
     const { name, phone, email, bank, account_num } = req.body;
-    const result1 = await supabase.auth.signUp({ email, password: phone.replaceAll('-','') });
+
+    const result1 = await service.auth.admin.createUser({
+        email:email,
+        password: phone.replaceAll('-',''),
+        email_confirm: true
+    });
     console.log("result1 = ", result1);
 
     const pw = await bcrypt.hash(phone.replaceAll('-',''),10);
-    const result = await supabase.from('member').upsert({
+    const result = await supa.from('member').upsert({
         nm:name,
         tel:phone,
         mail: email,
@@ -55,7 +60,7 @@ router.get('/email', function (req, res) {
 })
 
 router.post('/email', async function (req, res) {
-    let result = await supabase.from('member').select("*").eq('mail', req.body.email);
+    let result = await supa.from('member').select("*").eq('mail', req.body.email);
     console.log("중복 확인",result);
     if (result.data?.length > 0) {
         res.json({ success: false });
