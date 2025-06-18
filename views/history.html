@@ -1,18 +1,241 @@
 {% extends "layout.html" %}
 
 {% block content %}
-이력
+<div class="container">
+    <div class="page-title">작업 이력
+        <div class="page-select">
+            <select class="form-select" id="autoSizingSelect">
+                {% for i in range(1,13) %}
+                {% if i == month %}
+                <option value="{{i}}" selected>{{i}}월</option>
+                {% else %}
+                <option value="{{i}}">{{i}}월</option>
+                {% endif %}
+                {% endfor %}
+            </select>
+            <button class="res-btn" onclick="reSearchHistory()">조회</button>
+        </div>
+    </div>
+    {% if reservations.length>0 %}
+    {% for reservation in reservations %}
+    <div class="res-card" id="res{{reservation.res_no}}">
+        <div class="res-header">
+            <div class="res-user">
+                <i class="bi bi-person-circle"></i>
+                <span class="res-value">{{ reservation.user.name }}</span>
+            </div>
+            <button class="res-btn" onclick="pickup({{reservation.res_no}})">
+                <i class="bi bi-check2-circle"></i>
+                청소배정
+            </button>
+        </div>
+        <div class="res-info">
+            <div class="res-row">
+                <span class="res-label"><i class="bi bi-calendar-date"></i> 예약일</span>
+                <span class="res-value">{{ reservation.date.slice(0,10) }}</span>
+            </div>
+            <div class="res-row">
+                <span class="res-label"><i class="bi bi-clock"></i> 시간</span>
+                <span class="res-value">{{ reservation.time }}</span>
+            </div>
+            <div class="res-row">
+                <span class="res-label"><i class="bi bi-car-front"></i> 모델</span>
+                <span class="res-value">{{ reservation.model }}</span>
+            </div>
+            <div class="res-row">
+                <span class="res-label"><i class="bi bi-house"></i> 주소</span>
+                <span class="res-value">{{ reservation.addr or reservation.user.addr }}</span>
+            </div>
+            <div class="res-row">
+                <span class="res-label"><i class="bi bi-chat-left-text"></i> 요청</span>
+                <span class="res-value">{{ reservation.remark }}</span>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="res-card">
+        <div class="res-header">
+            <div class="res-info">
+                <div class="res-row">
+                    <span class="res-label"><i class="bi bi-inboxes"></i> 선택하신 달의 작업 내역이 없습니다.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 
+</div>
 {% endblock %}
 
 {% block script %}
 <script>
+    const $select = document.getElementById('autoSizingSelect');
+function reSearchHistory(){
+    window.location.href = "?month="+$select.value;
 
+}
 </script>
 {% endblock %}
 
 {% block style %}
 <style>
+    .container {
+        padding: 0.8rem;
+        max-width: 100%;
+        height: 100%;
+        overflow: auto;
+        margin-bottom: 1rem;
+    }
 
+    .page-title {
+        display:flex;
+        justify-content: space-between;
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #2d3436;
+        margin: 0.5rem 0 1rem 0.5rem;
+        position: relative;
+        padding-left: 0.8rem;
+    }
+    .page-select{
+        display:flex;
+        white-space:nowrap;
+        gap: 0.5rem;
+    }
+    .page-title::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 4px;
+        height: 70%;
+        background: #0084ff;
+        border-radius: 2px;
+    }
+
+    .res-card {
+        background: #ffffff;
+        border-radius: 12px;
+        margin-bottom: 0.8rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        overflow: hidden;
+        transition: transform 0.2s ease;
+    }
+
+    .res-card:active {
+        transform: scale(0.98);
+    }
+
+    .res-header {
+        background: #f8f9fa;
+        padding: 0.8rem 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #edf2f7;
+    }
+
+    .res-user {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .res-user i {
+        font-size: 1.2rem;
+        color: #0084ff;
+    }
+
+    .res-info {
+        padding: 0.8rem 1rem;
+    }
+
+    .res-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.4rem 0;
+        border-bottom: 1px dashed #edf2f7;
+    }
+
+    .res-row:last-child {
+        border-bottom: none;
+    }
+
+    .res-label {
+        color: #64748b;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+    .res-label i {
+        font-size: 1rem;
+        color: #0084ff;
+    }
+
+    .res-value {
+        font-weight: 500;
+        color: #1e293b;
+        font-size: 0.95rem;
+    }
+
+    .res-btn {
+        background: #0084ff;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        transition: all 0.2s ease;
+    }
+
+    .res-btn i {
+        font-size: 1rem;
+    }
+
+    .res-btn:active {
+        background: #019170;
+        transform: scale(0.95);
+    }
+
+    @media (max-width: 600px) {
+        .container {
+            padding: 0.5rem;
+        }
+
+        .page-title {
+            font-size: 1.2rem;
+            margin: 0.3rem 0 0.8rem 0.3rem;
+        }
+
+        .res-header {
+            padding: 0.7rem 0.8rem;
+        }
+
+        .res-info {
+            padding: 0.7rem 0.8rem;
+        }
+
+        .res-row {
+            padding: 0.3rem 0;
+        }
+
+        .res-label, .res-value {
+            font-size: 0.9rem;
+        }
+
+        .res-btn {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.85rem;
+        }
+    }
 </style>
 {% endblock %}

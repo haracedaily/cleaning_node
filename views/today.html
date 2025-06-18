@@ -1,18 +1,259 @@
 {% extends "layout.html" %}
 
 {% block content %}
-오늘 배정
+{% set stateList = [  { text: "신규예약", color: "#4CAF50" },
+{ text: "결제대기", color: "#FF9800" },
+{ text: "결제완료", color: "#2196F3" },
+{ text: "기사배정", color: "#9C27B0" },
+{ text: "청소완료", color: "#607D8B" },
+{ text: "예약취소", color: "#F44336" }] %}
+<div class="container">
+    <div class="modal">
+        asjdklasjdklasj
+    </div>
+    <div class="page-title">오늘 배정</div>
+    {% if todays.length>0 %}
+    {% for today in todays %}
+    <div class="res-card" id="res{{today.res_no}}">
+        <div class="res-header">
+            <div class="res-user">
+                <i class="bi bi-person-circle"></i>
+                <span class="res-value">{{ today.user.name }}</span>
+                <span style="
+                    dispaly:inline-flex;
+                    align-items: center;
+                    padding: 4px 12px;
+                    border-radius: 12px;
+                    font-size: 13px;
+                    color:{{stateList[today.state-1].color}};
+                    background-color: {{stateList[today.state-1].color}}15;
+                    border: 1px solid {{stateList[today.state-1].color}}30;
+                    white-space:nowrap;"
+                    >
+            {{stateList[today.state-1].text}}
+            </span>
+            </div>
 
+            <button class="res-btn" onclick="completeBtn({{today.res_no}})" disabled>
+                <i class="bi bi-check2-circle"></i>
+                청소완료
+            </button>
+        </div>
+        <div class="res-info">
+            <div class="res-row">
+                <span class="res-label"><i class="bi bi-calendar-date"></i> 예약일</span>
+                <span class="res-value">{{ today.date.slice(0,10) }}</span>
+            </div>
+            <div class="res-row">
+                <span class="res-label"><i class="bi bi-clock"></i> 시간</span>
+                <span class="res-value">{{ today.time }}</span>
+            </div>
+            <div class="res-row">
+                <span class="res-label"><i class="bi bi-car-front"></i> 모델</span>
+                <span class="res-value">{{ today.model }}</span>
+            </div>
+            <div class="res-row">
+                <span class="res-label"><i class="bi bi-house"></i> 주소</span>
+                <span class="res-value">{{ today.addr or today.user.addr }}</span>
+            </div>
+            <div class="res-row">
+                <span class="res-label"><i class="bi bi-chat-left-text"></i> 요청</span>
+                <span class="res-value">{{ today.remark }}</span>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="res-card">
+        <div class="res-header">
+            <div class="res-info">
+                <div class="res-row">
+                    <span class="res-label"><i class="bi bi-inboxes"></i> 오늘 작업할 예약이 없습니다.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
 {% endblock %}
 
 {% block script %}
 <script>
+function completeBtn(res_no){
 
+}
 </script>
 {% endblock %}
 
 {% block style %}
 <style>
+    main{
+        position : relative;
+    }
+    .container {
+        padding: 0.8rem;
+        max-width: 100%;
+        height: 100%;
+        overflow: auto;
+        margin-bottom: 1rem;
+    }
 
+    .modal{
+        width: 80%;
+        height: 80%;
+        border-radius: 8px;
+        box-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        z-index:99999;
+        top:10%;
+        left:10%;
+        display:flex;
+        position:absolute;
+        background-color:white;
+        border: 1px solid black;
+    }
+    .page-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #2d3436;
+        margin: 0.5rem 0 1rem 0.5rem;
+        position: relative;
+        padding-left: 0.8rem;
+    }
+
+    .page-title::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 4px;
+        height: 70%;
+        background: #0084ff;
+        border-radius: 2px;
+    }
+
+    .res-card {
+        background: #ffffff;
+        border-radius: 12px;
+        margin-bottom: 0.8rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        overflow: hidden;
+        transition: transform 0.2s ease;
+    }
+
+    .res-card:active {
+        transform: scale(0.98);
+    }
+
+    .res-header {
+        background: #f8f9fa;
+        padding: 0.8rem 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #edf2f7;
+    }
+
+    .res-user {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .res-user i {
+        font-size: 1.2rem;
+        color: #0084ff;
+    }
+
+    .res-info {
+        padding: 0.8rem 1rem;
+    }
+
+    .res-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.4rem 0;
+        border-bottom: 1px dashed #edf2f7;
+    }
+
+    .res-row:last-child {
+        border-bottom: none;
+    }
+
+    .res-label {
+        color: #64748b;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+    .res-label i {
+        font-size: 1rem;
+        color: #0084ff;
+    }
+
+    .res-value {
+        font-weight: 500;
+        color: #1e293b;
+        font-size: 0.95rem;
+    }
+
+    .res-btn {
+        background: #0084ff;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        transition: all 0.2s ease;
+    }
+
+    .res-btn i {
+        font-size: 1rem;
+    }
+
+    .res-btn:active {
+        background: #019170;
+        transform: scale(0.95);
+    }
+
+    @media (max-width: 600px) {
+        .container {
+            padding: 0.5rem;
+        }
+
+        .page-title {
+            font-size: 1.2rem;
+            margin: 0.3rem 0 0.8rem 0.3rem;
+        }
+
+        .res-header {
+            padding: 0.7rem 0.8rem;
+        }
+
+        .res-info {
+            padding: 0.7rem 0.8rem;
+        }
+
+        .res-row {
+            padding: 0.3rem 0;
+        }
+
+        .res-label, .res-value {
+            font-size: 0.9rem;
+        }
+
+        .res-btn {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.85rem;
+        }
+    }
 </style>
 {% endblock %}

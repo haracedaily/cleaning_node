@@ -6,6 +6,7 @@ const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const expressSession = require('express-session');
 const cors = require('cors');
+const {supa} = require('./utils/supa.js'); // supabase 유틸리티 모듈 불러오기
 require('dotenv').config();
 
 const app = express();
@@ -30,6 +31,7 @@ app.use(expressSession({
     },
     name: "session-cookie", // 쿠키 이름 설정
 }));
+
 app.set("port", 4020);
 app.set("view engine", "html");
 nunjucks.configure("views", {
