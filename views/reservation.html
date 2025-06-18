@@ -2,13 +2,14 @@
 
 {% block content %}
 <div class="container">
-    <h5 class="page-title">예약 현황</h5>
+    <div class="page-title">예약 현황</div>
+    {% if reservations.length>0 %}
     {% for reservation in reservations %}
-    <div class="res-card">
+    <div class="res-card" id="res{{reservation.res_no}}">
         <div class="res-header">
             <div class="res-user">
                 <i class="bi bi-person-circle"></i>
-                <span class="res-value">{{ reservation.user.username }}</span>
+                <span class="res-value">{{ reservation.user.name }}</span>
             </div>
             <button class="res-btn" onclick="pickup({{reservation.res_no}})">
                 <i class="bi bi-check2-circle"></i>
@@ -29,37 +30,75 @@
                 <span class="res-value">{{ reservation.model }}</span>
             </div>
             <div class="res-row">
+                <span class="res-label"><i class="bi bi-house"></i> 주소</span>
+                <span class="res-value">{{ reservation.addr or reservation.user.addr }}</span>
+            </div>
+            <div class="res-row">
                 <span class="res-label"><i class="bi bi-chat-left-text"></i> 요청</span>
                 <span class="res-value">{{ reservation.remark }}</span>
             </div>
         </div>
     </div>
     {% endfor %}
+    {% else %}
+    <div class="res-card">
+        <div class="res-header">
+            <div class="res-info">
+                <div class="res-row">
+                    <span class="res-label"><i class="bi bi-inboxes"></i> 현재 배정가능한 예약이 없습니다.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
 </div>
 {% endblock %}
 
 {% block script %}
 <script>
+    const { createClient } = supabase;
+    const supa = createClient("{{supabase_url}}", "{{supabase_key}}");
+
+    async function setupChannel() {
+        const channel = supa
+            .channel('res-db-changes')
+            .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'reservation' }, payload => {
+                console.log(payload);
+                if(payload.new.state!==3){
+                        if(document.getElementById("res"+payload.new.res_no)){
+                            //이부분 고민해보기 예약 건수 자체가 적어서 지금은 기괴함
+                            document.getElementById("res"+payload.new.res_no).style.display = "none";
+                        }else{
+                            window.location.href = '/gisa/reservation';
+                        }
+                }else{
+                    window.location.href = '/gisa/reservation';
+                }
+
+            })
+            .subscribe();
+
+        return channel;
+    }
+
+    // 사용 시
+    const chan = setupChannel();
+/*window.onbeforeunload = () => {
+    supa.removeChannel(chan);
+    console.log("채널 제거됨");
+}*/
+
+
 function pickup(res_no) {
- /*   if (confirm("청소를 배정하시겠습니까?")) {
-        fetch(`/reservation/pickup/${res_no}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert("청소가 배정되었습니다.");
-                location.reload();
-            } else {
-                alert("배정에 실패했습니다. 다시 시도해주세요.");
-            }
-        })
-        .catch(error => console.error('Error:', error));
-    }*/
+    console.log(res_no);
+    axios.post("pick",{
+        res_no
+    }).then((response) => {
+        console.log(response);
+    }).catch((error) => {
+        console.log(error);
+    })
 }
 </script>
 {% endblock %}
@@ -69,6 +108,9 @@ function pickup(res_no) {
 .container {
     padding: 0.8rem;
     max-width: 100%;
+    height: 100%;
+    overflow: auto;
+    margin-bottom: 1rem;
 }
 
 .page-title {
