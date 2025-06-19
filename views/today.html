@@ -8,8 +8,67 @@
 { text: "청소완료", color: "#607D8B" },
 { text: "예약취소", color: "#F44336" }] %}
 <div class="container">
-    <div class="modal">
-        asjdklasjdklasj
+    <div class="modal" id="completionModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="bi bi-check-circle-fill"></i>
+                    청소 완료 확인
+                </h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="modalClose()">
+<!--                    <i class="bi bi-x"></i>-->
+<!--                    <i class="bi bi-x-lg"></i>-->
+                    <i class="bi bi-x-circle"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="completion-info">
+                    <div class="info-item">
+                        <i class="bi bi-person-circle"></i>
+                        <span id="modalUserName">고객명</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="bi bi-calendar-date"></i>
+                        <span id="modalDate">예약일</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="bi bi-clock"></i>
+                        <span id="modalTime">시간</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="bi bi-car-front"></i>
+                        <span id="modalModel">모델</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="bi bi-house"></i>
+                        <span id="modalAddr">주소</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="bi bi-journal-text"></i>
+                        <label for="modalContent"></label>
+                        <textarea id="modalContent" cols="30" rows="5"></textarea>
+                    </div>
+                    <div class="info-item">
+                        <i class="bi bi-image"></i>
+                        <input type="file" class="form-control" accept="image/*" id="modalImage" multiple>
+                        <label for="modalImage"></label>
+                    </div>
+                    <div id="filePreview">
+
+                    </div>
+                </div>
+                <div class="completion-actions">
+                    <button class="btn-confirm" onclick="confirmCompletion(this)">
+                        <i class="bi bi-check2-circle"></i>
+                        청소 완료 확인
+                    </button>
+                    <button class="btn-cancel" onclick="modalClose()">
+                        <i class="bi bi-x-circle"></i>
+                        취소
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="page-title">오늘 배정</div>
     {% if todays.length>0 %}
@@ -20,7 +79,7 @@
                 <i class="bi bi-person-circle"></i>
                 <span class="res-value">{{ today.user.name }}</span>
                 <span style="
-                    dispaly:inline-flex;
+                    display:inline-flex;
                     align-items: center;
                     padding: 4px 12px;
                     border-radius: 12px;
@@ -34,7 +93,7 @@
             </span>
             </div>
 
-            <button class="res-btn" onclick="completeBtn({{today.res_no}})" disabled>
+            <button class="res-btn" onclick="modal_open('{{today.res_no}}', '{{today.user.name}}', '{{today.date.slice(0,10)}}', '{{today.time}}', '{{today.model}}', '{{today.addr or today.user.addr}}')">
                 <i class="bi bi-check2-circle"></i>
                 청소완료
             </button>
@@ -80,9 +139,136 @@
 
 {% block script %}
 <script>
-function completeBtn(res_no){
+    const $modal = document.querySelector('#completionModal');
+    let currentReservation = null;
 
-}
+    function modal_open(res_no, user_name, date, time, model, addr){
+        const preview = document.getElementById('filePreview');
+        preview.innerHTML = '';
+        console.log('모달 열기:', res_no, user_name, date, time, model, addr);
+        currentReservation = { res_no, user_name, date, time, model, addr };
+
+        // 모달 내용 업데이트
+        document.getElementById('modalUserName').textContent = user_name;
+        document.getElementById('modalDate').textContent = date;
+        document.getElementById('modalTime').textContent = time;
+        document.getElementById('modalModel').textContent = model;
+        document.getElementById('modalAddr').textContent = addr;
+        // document.getElementById('modalImage').value = '';
+        document.getElementById('modalContent').value = '';
+        $modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function modalClose(){
+        $modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        currentReservation = null;
+    }
+
+    async function confirmCompletion(submitBtn){
+        currentReservation.files = document.getElementById('modalImage').files;
+        currentReservation.memo = document.getElementById('modalContent').value;
+
+        try {
+            // 파일들을 Base64로 변환
+            const files = [];
+            for (let i = 0; i < currentReservation?.files.length; i++) {
+                const file = currentReservation.files[i];
+                console.log('업로드 파일',file);
+                // 파일 크기 검증 (50MB)
+                if (file.size > 50 * 1024 * 1024) {
+                    alert(`파일 ${file.name}이 50MB를 초과합니다.`);
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '완료 처리';
+                    return;
+                }
+
+                // 이미지 파일 검증
+                if (!file.type.startsWith('image/')) {
+                    alert(`파일 ${file.name}은 이미지 파일이 아닙니다.`);
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '완료 처리';
+                    return;
+                }
+
+                const base64Data = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.readAsDataURL(file);
+                });
+                console.log(file);
+                files.push({
+                    name: file.name,
+                    type: file.type,
+                    size: file.size,
+                    data: base64Data
+                });
+            }
+    console.log('왜 없지',files);
+
+            currentReservation.files=files;
+            const result = await axios.post('/gisa/complete', currentReservation, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (result.data.status === 'success') {
+                alert('청소완료 처리가 성공적으로 완료되었습니다.');
+                // location.reload();
+            } else if (result.data.status === 'fail') {
+                alert(result.data.message || '로그인이 필요합니다.');
+            } else {
+                alert(result.data.message || '처리 중 오류가 발생했습니다.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            if (error.response && error.response.data && error.response.data.message) {
+                alert(error.response.data.message);
+            } else {
+                alert('서버 오류가 발생했습니다.');
+            }
+        } finally {
+            // 버튼 다시 활성화
+            submitBtn.disabled = false;
+            submitBtn.textContent = '완료 처리';
+        }
+            modalClose();
+    }
+
+    // file preview 제공
+    document.getElementById('modalImage').addEventListener('change', function(e) {
+        const preview = document.getElementById('filePreview');
+        preview.innerHTML = '';
+
+        const files = e.target.files;
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.style.width = '100px';
+                    img.style.height = '100px';
+                    img.style.objectFit = 'cover';
+                    img.style.margin = '5px';
+                    img.style.border = '1px solid #ddd';
+                    img.style.borderRadius = '5px';
+                    preview.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+    });
+
+    // 모달 외부 클릭시 닫기
+    $modal.addEventListener('click', function(e) {
+        if (e.target === $modal) {
+            modalClose();
+        }
+    });
 </script>
 {% endblock %}
 
@@ -99,19 +285,165 @@ function completeBtn(res_no){
         margin-bottom: 1rem;
     }
 
+    /* 모달 스타일 */
     .modal{
-        width: 80%;
-        height: 80%;
-        border-radius: 8px;
-        box-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-        z-index:99999;
-        top:10%;
-        left:10%;
-        display:flex;
-        position:absolute;
-        background-color:white;
-        border: 1px solid black;
+        width: 100%;
+        height: 100%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
     }
+
+    .modal-container {
+        background: white;
+        border-radius: 16px;
+        width: 90%;
+        max-width: 400px;
+        max-height: 80vh;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        animation: modalSlideIn 0.3s ease-out;
+    }
+
+    @keyframes modalSlideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-50px) scale(0.9);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    .modal-header {
+        background: linear-gradient(135deg, #0084ff, #0160fe);
+        color: white;
+        padding: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-title {
+        margin: 0;
+        font-size: 1.2rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .modal-title i {
+        font-size: 1.4rem;
+    }
+
+    .btn-close {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 0.5rem;
+        border-radius: 50%;
+        transition: background-color 0.2s;
+        display:flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-close:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+        overflow: auto;
+        margin-bottom:1rem;
+        height: 73vh;
+    }
+
+    .completion-info {
+        margin-bottom: 2rem;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        padding: 0.8rem 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .info-item:last-child {
+        border-bottom: none;
+    }
+
+    .info-item i {
+        font-size: 1.2rem;
+        color: #0084ff;
+        width: 20px;
+        text-align: center;
+    }
+
+    .info-item span {
+        font-weight: 500;
+        color: #333;
+    }
+
+    .completion-actions {
+        display: flex;
+        gap: 1rem;
+        flex-direction: column;
+    }
+
+    .btn-confirm {
+        background: linear-gradient(135deg, #4CAF50, #45a049);
+        color: white;
+        border: none;
+        padding: 1rem;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-confirm:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(76, 175, 80, 0.3);
+    }
+
+    .btn-cancel {
+        background: #f8f9fa;
+        color: #6c757d;
+        border: 1px solid #dee2e6;
+        padding: 1rem;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-cancel:hover {
+        background: #e9ecef;
+        transform: translateY(-2px);
+    }
+
     .page-title {
         font-size: 1.3rem;
         font-weight: 600;
@@ -213,6 +545,7 @@ function completeBtn(res_no){
         align-items: center;
         gap: 0.4rem;
         transition: all 0.2s ease;
+        cursor: pointer;
     }
 
     .res-btn i {
@@ -253,6 +586,20 @@ function completeBtn(res_no){
         .res-btn {
             padding: 0.4rem 0.8rem;
             font-size: 0.85rem;
+        }
+
+        .modal-container {
+            width: 95%;
+            margin: 1rem;
+        }
+
+        .modal-header {
+            padding: 1rem;
+            height: 7vh;
+        }
+
+        .modal-body {
+            padding: 1rem;
         }
     }
 </style>
