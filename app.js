@@ -17,7 +17,7 @@ app.use(cors({
     methods: ["GET", "POST", "PUT", "DELETE"], // 허용할 HTTP 메소드
 })); // CORS 설정
 app.use(morgan("dev"));
-app.use(express.json(), express.urlencoded({ extended: false }));
+app.use(express.json({limit:'50mb'}), express.urlencoded({ limit:'50mb',extended: false }));
 app.use("/", express.static(path.join(__dirname, "public")));
 app.use(cookieParser(process.env.COOKIE_SECRET));
 app.use(expressSession({

@@ -5,8 +5,8 @@ const {supa} = require('../utils/supa.js');
 router.post('/login', async function (req, res) {
     console.log("로그인 바디 : ",req.body);
     supa.auth.signInWithPassword({
-        email: req.body.id,
-        password: req.body.pw
+        email: req.body.id.trim(),
+        password: req.body.pw.trim()
     }).then(async ({data, error}) => {
         if (error) {
             console.error('로그인 에러:', error);
