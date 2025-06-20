@@ -53,8 +53,10 @@ app.get('/', function (req, res) {
     if(req.session.user) {
         // 로그인 상태
         res.render('today',{title: 'ICECARE', request: req});
-    }else
+    }else{
+        res.clearCookie('session-cookie');
     res.render('user/login',{title: '로그인', request: req});
+    }
 })
 
 /* 미들웨어 장착 끝 */

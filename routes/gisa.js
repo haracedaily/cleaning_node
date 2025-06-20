@@ -3,28 +3,23 @@ const router = express.Router();
 const {supa} = require('../utils/supa');
 router.get('/',async function (req, res) {
 // 1. 오늘 00:00:00.000 UTC (또는 로컬 시간) 계산
-    const today = new Date().toISOString();
+    if(!req.session.user)return res.redirect('/');
+    const offset = new Date().getTimezoneOffset() * 60000;
 
-    console.log(today.month);
-    console.log(today.date);
-    console.log(today.day);
-    const todayStart = today; // ISO 문자열 필요 :contentReference[oaicite:1]{index=1}
+    const today = new Date(Date.now() - offset); // 예: 2025‑06‑19T...
+    const dateOnly = today.toISOString().slice(0,10); // "2025-06-19"
+    const start = dateOnly + 'T00:00:00Z';
+    const end   = dateOnly + 'T23:59:59Z';
 
-// 2. 내일 00:00:00.000 계산
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const tomorrowStart = tomorrow.toISOString();
-
-// 3. Supabase 쿼리
     const { data, error } = await supa
         .from('reservation')
         .select('*')
-        .eq("gisa_email",req.session.user.mail)
-        .gte('date', todayStart)
-        .lt('date', tomorrowStart);  // < 다음 날 시작
+        .eq('gisa_email', req.session.user.mail)
+        .gte('date', start)
+        .lte('date', end);
+
     console.log(data);
-    console.log(todayStart);
-    console.log(tomorrowStart);
+
     console.log(req.session);
     if(!error)
         res.render('today',{title: 'ICECARE', request: req, todays:data});
@@ -32,13 +27,18 @@ router.get('/',async function (req, res) {
         res.render('today',{title: 'ICECARE', request: req, todays:[]});
 })
 router.get('/order', async function (req, res) {
+    const offset = new Date().getTimezoneOffset() * 60000;
+    const today = new Date(Date.now() - offset); // 예: 2025‑06‑19T...
+    const dateOnly = today.toISOString().slice(0,8)+'01'; // "2025-06-"
+    const start = dateOnly + 'T00:00:00Z';
     // console.log("오더 조회 로그인 계정 확인 : ",req.session.user.mail);
-    const {data,error} = await supa.from('reservation').select('*,user:customer!user_email(email,name,phone,addr,image_url)').eq('gisa_email',req.session.user.mail.trim());
+    const {data,error} = await supa.from('reservation').select('*,user:customer!user_email(email,name,phone,addr,image_url)').eq('gisa_email',req.session.user.mail.trim()).gte('date', start);
     // console.log("배정된 예약 건 : ",data);
+    const cnt = [...data].filter(el=>el.state!==5)?.length;
 if(!error)
-  res.render('order',{title: 'ICECARE', request: req,orderList:data});
+  res.render('order',{title: 'ICECARE', request: req,orderList:data,cnt});
 else
-    res.render('order',{title: 'ICECARE', request: req,orderList:[]});
+    res.render('order',{title: 'ICECARE', request: req,orderList:[],cnt});
 })
 router.get('/reservation',async function (req, res) {
 
@@ -57,13 +57,20 @@ router.get('/reservation',async function (req, res) {
 })
 router.get('/history',async function (req, res) {
     const month = req.query?.month || new Date().getMonth()+1;
+    const offset = new Date().getTimezoneOffset() * 60000;
+    const today = new Date(Date.now() - offset);
+    console.log(today.getMonth()+1, today.getDate(), today.getFullYear(),today.getUTCFullYear());
     console.log(month);
     console.log("오늘",new Date());
     console.log('날짜 문자화',new Date().toISOString());
-
+    const start = today.toISOString().slice(0,8)+'01T00:00:00Z';
+    const last = new Date(today.getFullYear(), month, 0).toISOString().slice(0,10)+'T23:59:59Z';
     if(!req.session?.user) res.redirect('/');
-    // await supa.from('reservation').eq('gisa_email',req.session.user.mail)
-    res.render('history',{title: 'ICECARE', request: req, month});
+    const {data:history,error} = await supa.from('reservation').select('*,user:customer!user_email(email,name,phone,addr,image_url)').eq('gisa_email',req.session.user.mail).gte('date',start).lte('date',last);
+    if(!error)
+    res.render('history',{title: 'ICECARE', request: req, month,history});
+    else
+        res.render('history',{title: 'ICECARE', request: req, month,history:[]});
 })
 
 router.post('/pick',async function (req, res) {
@@ -146,7 +153,7 @@ router.post('/complete',async function (req, res) {
             console.error('예약 상태 업데이트 오류:', updateError);
             return res.json({status: 'error', message: '상태 업데이트 중 오류가 발생했습니다.'});
         }
-
+        else
         return res.json({status: 'success', message: '청소완료 처리가 성공적으로 완료되었습니다.'});
 
     } catch (error) {

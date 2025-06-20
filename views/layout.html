@@ -16,6 +16,68 @@
 </head>
 <body>
 <main>
+    <div class="modal" id="completionModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="bi bi-check-circle-fill"></i>
+                    청소 완료 확인
+                </h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="modalClose()">
+                    <!--                    <i class="bi bi-x"></i>-->
+                    <!--                    <i class="bi bi-x-lg"></i>-->
+                    <i class="bi bi-x-circle"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="completion-info">
+                    <div class="info-item">
+                        <i class="bi bi-person-circle"></i>
+                        <span id="modalUserName">고객명</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="bi bi-calendar-date"></i>
+                        <span id="modalDate">예약일</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="bi bi-clock"></i>
+                        <span id="modalTime">시간</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="bi bi-car-front"></i>
+                        <span id="modalModel">모델</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="bi bi-house"></i>
+                        <span id="modalAddr">주소</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="bi bi-journal-text"></i>
+                        <label for="modalContent"></label>
+                        <textarea id="modalContent" cols="30" rows="5"></textarea>
+                    </div>
+                    <div class="info-item">
+                        <i class="bi bi-image"></i>
+                        <input type="file" class="form-control" accept="image/*" id="modalImage" multiple>
+                        <label for="modalImage"></label>
+                    </div>
+                    <div id="filePreview">
+
+                    </div>
+                </div>
+                <div class="completion-actions">
+                    <button class="btn-confirm" onclick="confirmCompletion(this)">
+                        <i class="bi bi-check2-circle"></i>
+                        청소 완료 확인
+                    </button>
+                    <button class="btn-cancel" onclick="modalClose()">
+                        <i class="bi bi-x-circle"></i>
+                        취소
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
     {% if request.originalUrl !== '/profile' %}
     {% include './component/card.html' %}
     {% include './component/menu.html' %}
