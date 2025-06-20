@@ -16,17 +16,17 @@
             <button class="res-btn" onclick="reSearchHistory()">조회</button>
         </div>
     </div>
-    {% if reservations.length>0 %}
-    {% for reservation in reservations %}
+    {% if history.length>0 %}
+    {% for reservation in history %}
     <div class="res-card" id="res{{reservation.res_no}}">
         <div class="res-header">
             <div class="res-user">
                 <i class="bi bi-person-circle"></i>
                 <span class="res-value">{{ reservation.user.name }}</span>
             </div>
-            <button class="res-btn" onclick="pickup({{reservation.res_no}})">
+            <button class="res-btn" onclick="lookup('{{reservation.res_no}}')">
                 <i class="bi bi-check2-circle"></i>
-                청소배정
+                보고확인
             </button>
         </div>
         <div class="res-info">

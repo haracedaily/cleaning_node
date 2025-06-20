@@ -77,7 +77,25 @@ a {
     padding: 0.8rem 0;
     font-weight: 500;
 }
-
+.logo {
+    width: 60%;
+    max-width: 250px;
+    margin-top: 3rem;
+    margin-bottom: 0.5rem;
+}
+.logo img {
+    width: 100%;
+    margin-top: 2rem;
+    height: auto;
+}
+.peng {
+    width: 90%;
+    max-width: 250px;
+    margin-bottom: 0.5rem;
+}
+.peng img {
+    width: 100%;
+}
 .nav-underline .nav-link.active {
     color: #0084FF;
     border-bottom: 2px solid #0084FF;
