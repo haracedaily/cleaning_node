@@ -1,47 +1,14 @@
 // 프로필 수정 페이지 JavaScript
 
+
 document.addEventListener('DOMContentLoaded', function() {
     initializeProfileEdit();
 });
 
 // 프로필 수정 초기화
 function initializeProfileEdit() {
-    loadUserProfile();
     setupEventListeners();
     setupPasswordValidation();
-}
-
-// 사용자 프로필 로드
-async function loadUserProfile() {
-    try {
-        // JWT 토큰에서 사용자 정보 가져오기
-        const token = localStorage.getItem('accessToken');
-        if (!token) {
-            showMessage('로그인이 필요합니다.', 'error');
-            return;
-        }
-
-        // 실제 구현에서는 API 호출로 사용자 정보를 가져옵니다
-        const userInfo = await getUserInfo(token);
-        
-        // 폼에 사용자 정보 채우기
-        document.getElementById('name').value = userInfo.name || '';
-        document.getElementById('email').value = userInfo.email || '';
-        document.getElementById('phone').value = userInfo.phone || '';
-        
-        // 프로필 사진 설정
-        if (userInfo.profileImage) {
-            document.getElementById('profileImage').src = userInfo.profileImage;
-        }
-        
-        // 알림 설정
-        document.getElementById('pushNotification').checked = userInfo.pushNotification || false;
-        document.getElementById('emailNotification').checked = userInfo.emailNotification || false;
-        
-    } catch (error) {
-        console.error('프로필 로드 실패:', error);
-        showMessage('프로필 정보를 불러오는데 실패했습니다.', 'error');
-    }
 }
 
 // 이벤트 리스너 설정
@@ -81,8 +48,8 @@ function handlePhotoChange(event) {
     if (!file) return;
     
     // 파일 크기 검증 (5MB 제한)
-    if (file.size > 5 * 1024 * 1024) {
-        showMessage('파일 크기는 5MB 이하여야 합니다.', 'error');
+    if (file.size > 50 * 1024 * 1024) {
+        showMessage('파일 크기는 50MB 이하여야 합니다.', 'error');
         return;
     }
     
@@ -99,9 +66,22 @@ function handlePhotoChange(event) {
     };
     reader.readAsDataURL(file);
 }
-
+async function comparePw(pw,el){
+    if(el.value){
+        el.parentNode.dataset.comparePw='비밀번호 변경을 원할 경우 입력해주세요.';
+        el.parentNode.style.setProperty('--compare-pw','black');
+    }
+    if(await bcrypt.compare(el.value,pw)){
+        el.parentNode.dataset.comparePw = '확인되었습니다.';
+        el.parentNode.style.setProperty('--compare-pw','green');
+    }else{
+        el.parentNode.dataset.comparePw = '비밀번호가 다릅니다.';
+        el.parentNode.style.setProperty('--compare-pw','red');
+    }
+}
 // 비밀번호 강도 검증
 function validatePasswordStrength() {
+
     const password = document.getElementById('newPassword').value;
     const strengthElement = document.getElementById('passwordStrength');
     
@@ -110,15 +90,15 @@ function validatePasswordStrength() {
         strengthElement.textContent = '';
         return;
     }
-    
+
     let strength = 0;
     let feedback = [];
     
     // 길이 검증
-    if (password.length >= 8) {
+    if (password.length >= 6) {
         strength += 1;
     } else {
-        feedback.push('8자 이상');
+        feedback.push('6자 이상');
     }
     
     // 대문자 포함
@@ -207,16 +187,53 @@ async function handleFormSubmit(event) {
         // 로딩 상태 표시
         submitButton.disabled = true;
         submitButton.innerHTML = '<i class="bi bi-arrow-clockwise spin"></i> 저장 중...';
-        
+        console.log('entry 전 폼 데이터',formData);
+        console.log('entry 후 폼 데이터 : ', Object.fromEntries(formData));
         // 프로필 업데이트
-        await updateProfile(formData);
-        
-        showMessage('프로필이 성공적으로 업데이트되었습니다.', 'success');
+        const sendData= Object.fromEntries(formData);
+            // 파일들을 Base64로 변환
+            const file = document.getElementById('photoInput').files[0];
+
+                console.log('업로드 파일',file);
+                // 파일 크기 검증 (50MB)
+            if(file) {
+                const base64Data = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.readAsDataURL(file);
+                });
+                console.log(file);
+                console.log(base64Data);
+                sendData.file = {
+                    name: file.name,
+                    type: file.type,
+                    size: file.size,
+                    data: base64Data
+                };
+
+            }
+            console.log(file);
+
+            console.log(sendData);
+            const result = await axios.post('/user/profileUpdate', sendData, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (result.data.status === 'success') {
+                showMessage('프로필이 성공적으로 업데이트되었습니다.', 'success');
+                // location.reload();
+            } else {
+                showMessage('프로필 업데이트에 실패했습니다.', 'error');
+            }
+
+
         
         // 잠시 후 이전 페이지로 이동
-        setTimeout(() => {
-            history.back();
-        }, 1500);
+        // setTimeout(() => {
+        //     history.back();
+        // }, 1500);
         
     } catch (error) {
         console.error('프로필 업데이트 실패:', error);
@@ -235,7 +252,7 @@ function validateForm() {
     const currentPassword = document.getElementById('currentPassword').value;
     const newPassword = document.getElementById('newPassword').value;
     const confirmPassword = document.getElementById('confirmPassword').value;
-    
+    const comparePw = document.querySelector('.compare-password');
     // 이름 검증
     if (!name) {
         showMessage('이름을 입력해주세요.', 'error');
@@ -248,18 +265,23 @@ function validateForm() {
             showMessage('현재 비밀번호를 입력해주세요.', 'error');
             return false;
         }
-        
+
+        if(comparePw.dataset.comparePw!=='확인되었습니다.'){
+            showMessage('현재 비밀번호를 정확히 입력해주세요.', 'error');
+            return false;
+        }
         if (!newPassword) {
             showMessage('새 비밀번호를 입력해주세요.', 'error');
             return false;
         }
         
-        if (newPassword.length < 8) {
-            showMessage('새 비밀번호는 8자 이상이어야 합니다.', 'error');
+        if (newPassword.length < 6) {
+            showMessage('새 비밀번호는 6자 이상이어야 합니다.', 'error');
             return false;
         }
         
         if (newPassword !== confirmPassword) {
+            console.log("x")
             showMessage('새 비밀번호가 일치하지 않습니다.', 'error');
             return false;
         }
@@ -268,31 +290,7 @@ function validateForm() {
     return true;
 }
 
-// 사용자 정보 가져오기 (실제 구현에서는 API 호출)
-async function getUserInfo(token) {
-    // 실제 구현에서는 JWT 토큰을 디코드하거나 API 호출
-    // 여기서는 예시 데이터를 반환
-    return {
-        name: '홍길동',
-        email: 'hong@example.com',
-        phone: '010-1234-5678',
-        profileImage: '/images/profile-placeholder.png',
-        pushNotification: true,
-        emailNotification: false
-    };
-}
 
-// 프로필 업데이트 (실제 구현에서는 API 호출)
-async function updateProfile(formData) {
-    // 실제 구현에서는 서버로 데이터 전송
-    console.log('프로필 업데이트:', Object.fromEntries(formData));
-    
-    // 시뮬레이션을 위한 지연
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // 성공 응답 시뮬레이션
-    return { success: true };
-}
 
 // 메시지 표시
 function showMessage(message, type = 'info') {
@@ -309,14 +307,14 @@ function showMessage(message, type = 'info') {
     
     // 폼 상단에 삽입
     const form = document.getElementById('profileForm');
-    form.insertBefore(messageElement, form.firstChild);
+    form.insertBefore(messageElement, form.lastChild.previousSibling);
     
     // 5초 후 자동 제거
     setTimeout(() => {
         if (messageElement.parentNode) {
             messageElement.remove();
         }
-    }, 5000);
+    }, 3000);
 }
 
 // 이미지 압축 (선택사항)

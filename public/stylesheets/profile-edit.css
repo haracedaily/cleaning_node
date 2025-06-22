@@ -245,6 +245,22 @@
     color: #0c5460;
     border: 1px solid #bee5eb;
 }
+:root{
+    --compare-pw:black;
+}
+.compare-password{
+    position: relative;
+    &:after{
+        content: attr(data-compare-pw);
+        position: absolute;
+        display: block;
+        bottom:-1rem;
+        left: 0;
+        font-size: 0.7rem;
+        color:var(--compare-pw);
+    }
+}
+
 
 /* 토글 스위치 */
 .toggle-group {
