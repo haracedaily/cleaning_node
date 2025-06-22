@@ -34,7 +34,11 @@
                 </div>
             </div>
             <div class="text-center" style="min-width: 100px;">
+                {% if request.session.user.file_url %}
+                <img src="{{request.session.user.file_url}}" alt="프로필 이미지" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #0084ff; padding: 2px;">
+                {% else %}
                 <img src="/images/profile-placeholder.png" alt="프로필 이미지" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #0084ff; padding: 2px;">
+                {% endif %}
             </div>
         </div>
     </div>
