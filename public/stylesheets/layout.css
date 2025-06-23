@@ -18,7 +18,8 @@ main {
     display: flex;
     flex-direction: column;
     align-items: center;
-    overflow: hidden;
+    overflow-y: auto;
+    scrollbar-width: none;
     position: relative;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
 }

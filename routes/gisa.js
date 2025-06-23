@@ -18,13 +18,27 @@ router.get('/',async function (req, res) {
         .gte('date', start)
         .lte('date', end);
 
-    console.log(data);
+    console.log("today : ",data);
 
     console.log(req.session);
-    if(!error)
+    if(!error){
+
+        req.session.objCnt = data.reduce((a,b)=>{
+            if(b.state !== 5){
+                a[1]+=1;
+            }
+            else {
+                a[0] += 1;
+                a[1] += 1;
+            }
+            return a;
+        },[0,0]);
         res.render('today',{title: 'ICECARE', request: req, todays:data});
-    else
-        res.render('today',{title: 'ICECARE', request: req, todays:[]});
+    }
+    else{
+        req.session.objCnt =[0,0];
+            res.render('today',{title: 'ICECARE', request: req, todays:[]});
+    }
 })
 router.get('/order', async function (req, res) {
     const offset = new Date().getTimezoneOffset() * 60000;
@@ -59,14 +73,14 @@ router.get('/history',async function (req, res) {
     const month = req.query?.month || new Date().getMonth()+1;
     const offset = new Date().getTimezoneOffset() * 60000;
     const today = new Date(Date.now() - offset);
-    console.log(today.getMonth()+1, today.getDate(), today.getFullYear(),today.getUTCFullYear());
-    console.log(month);
-    console.log("오늘",new Date());
-    console.log('날짜 문자화',new Date().toISOString());
+    // console.log(today.getMonth()+1, today.getDate(), today.getFullYear(),today.getUTCFullYear());
+    // console.log(month);
+    // console.log("오늘",new Date());
+    // console.log('날짜 문자화',new Date().toISOString());
     const start = today.toISOString().slice(0,8)+'01T00:00:00Z';
     const last = new Date(today.getFullYear(), month, 0).toISOString().slice(0,10)+'T23:59:59Z';
     if(!req.session?.user) res.redirect('/');
-    const {data:history,error} = await supa.from('reservation').select('*,user:customer!user_email(email,name,phone,addr,image_url)').eq('gisa_email',req.session.user.mail).gte('date',start).lte('date',last);
+    const {data:history,error} = await supa.from('reservation').select('*,user:customer!user_email(email,name,phone,addr,image_url),work:ice_work!res_no(memo,images_url)').eq('state',5).eq('gisa_email',req.session.user.mail).gte('date',start).lte('date',last);
     if(!error)
     res.render('history',{title: 'ICECARE', request: req, month,history});
     else
@@ -129,12 +143,12 @@ router.post('/complete',async function (req, res) {
         // 청소 기사 테이블 수정 데이터를 데이터베이스에 저장
         const {data: completeData, error: completeError} = await supa
             .from('ice_work')
-            .insert([{
+            .upsert([{
                 memo: memo,
                 images_url: uploadedFilePaths.join(','), // public image 주소
                 gisa_id : req.session.user.id,
                 res_no
-            }])
+            }],{ onConflict: 'res_no' })
             .select();
 
         if (completeError) {
