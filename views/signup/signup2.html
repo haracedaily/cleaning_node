@@ -10,6 +10,7 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         #emailForm{
             position:relative;
@@ -56,7 +57,14 @@
             const regEmail = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
 
             if(!regEmail.test(email)) {
-                alert('이메일 형식에 따라 정확히 입력해주세요');
+                Swal.fire({
+                    position: "center",
+                    icon: "warning",
+                    title: '이메일 형식에 따라 정확히 입력해주세요',
+                    showConfirmButton: false,
+                    timer: 1000
+                });
+
                 return;
             }
 
@@ -74,7 +82,14 @@
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('오류가 발생했습니다. 다시 시도해주세요.');
+                    Swal.fire({
+                        position: "center",
+                        icon: "error",
+                        title: '오류가 발생했습니다. 다시 시도해주세요.',
+                        showConfirmButton: false,
+                        timer: 1000
+                    });
+
                 });
 
         })
@@ -98,11 +113,24 @@
         const email = document.getElementById('email').value.trim();
         const regEmail = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
         if(!regEmail.test(email)) {
-            alert('이메일 형식에 따라 정확히 입력해주세요');
+            Swal.fire({
+                position: "center",
+                icon: "warning",
+                title: '이메일 형식에 따라 정확히 입력해주세요',
+                showConfirmButton: false,
+                timer: 1000
+            });
             return;
         }
         if (emailForm.dataset.repeat !== '사용 가능한 이메일입니다.') {
-            alert('이메일 중복 확인을 해주세요.');
+
+            Swal.fire({
+                position: "center",
+                icon: "warning",
+                title: '이메일 중복 확인을 해주세요.',
+                showConfirmButton: false,
+                timer: 1000
+            });
             return;
         }
         window.location.href = '/signup/email?email=' + encodeURIComponent(email);

@@ -80,7 +80,13 @@ async function confirmCompletion(submitBtn) {
             console.log('업로드 파일', file);
 // 파일 크기 검증 (50MB)
             if (file.size > 50 * 1024 * 1024) {
-                alert(`파일 ${file.name}이 50MB를 초과합니다.`);
+                Swal.fire({
+                    position: "center",
+                    icon: "warning",
+                    title: `파일 ${file.name}이 50MB를 초과합니다.`,
+                    showConfirmButton: false,
+                    timer: 1000
+                });
                 submitBtn.disabled = false;
                 submitBtn.textContent = '완료 처리';
                 return;
@@ -88,7 +94,14 @@ async function confirmCompletion(submitBtn) {
 
 // 이미지 파일 검증
             if (!file.type.startsWith('image/')) {
-                alert(`파일 ${file.name}은 이미지 파일이 아닙니다.`);
+                Swal.fire({
+                    position: "center",
+                    icon: "warning",
+                    title: `파일 ${file.name}은 이미지 파일이 아닙니다.`,
+                    showConfirmButton: false,
+                    timer: 1000
+                });
+
                 submitBtn.disabled = false;
                 submitBtn.textContent = '완료 처리';
                 return;
@@ -117,19 +130,49 @@ async function confirmCompletion(submitBtn) {
         });
 
         if (result.data.status === 'success') {
-            alert('청소완료 처리가 성공적으로 완료되었습니다.');
+            Swal.fire({
+                position: "center",
+                icon: "success",
+                title: '청소완료 처리가 성공적으로 완료되었습니다.',
+                showConfirmButton: false,
+                timer: 1000
+            });
             location.reload();
         } else if (result.data.status === 'fail') {
-            alert(result.data.message || '로그인이 필요합니다.');
+            Swal.fire({
+                position: "center",
+                icon: "error",
+                title: result.data.message || '로그인이 필요합니다.',
+                showConfirmButton: false,
+                timer: 1000
+            });
         } else {
-            alert(result.data.message || '처리 중 오류가 발생했습니다.');
+            Swal.fire({
+                position: "center",
+                icon: "error",
+                title: result.data.message || '처리 중 오류가 발생했습니다.',
+                showConfirmButton: false,
+                timer: 1000
+            });
         }
     } catch (error) {
         console.error('Error:', error);
         if (error.response && error.response.data && error.response.data.message) {
-            alert(error.response.data.message);
+            Swal.fire({
+                position: "center",
+                icon: "error",
+                title: error.response.data.message,
+                showConfirmButton: false,
+                timer: 1000
+            });
         } else {
-            alert('서버 오류가 발생했습니다.');
+            Swal.fire({
+                position: "center",
+                icon: "error",
+                title: '서버 오류가 발생했습니다.',
+                showConfirmButton: false,
+                timer: 1000
+            });
         }
     } finally {
 // 버튼 다시 활성화
