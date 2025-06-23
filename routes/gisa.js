@@ -11,6 +11,17 @@ router.get('/',async function (req, res) {
     const start = dateOnly + 'T00:00:00Z';
     const end   = dateOnly + 'T23:59:59Z';
 
+    let prevMonth = new Date(today.getFullYear(), today.getMonth()-1, 1);
+    const month_start = prevMonth.toISOString().slice(0,8)+'01T00:00:00Z';
+    const month_last = new Date(today.getFullYear(), today.getMonth(), 0).toISOString().slice(0,10)+'T23:59:59Z';
+
+    const {data:payData,error:payError} = await supa.from('reservation').select('price.sum()').gte('state',5).neq('state',6).gte('date',month_start).lte('date',month_last);
+    console.log(payData);
+    if(!payError)
+    req.session.payed = payData[0].sum? parseInt(payData[0].sum*0.7).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') : 0;
+    else
+        req.session.payed = 0;
+    console.log(payError);
     const { data, error } = await supa
         .from('reservation')
         .select('*')
@@ -41,6 +52,7 @@ router.get('/',async function (req, res) {
     }
 })
 router.get('/order', async function (req, res) {
+    if(!req.session.user) return res.redirect('/');
     const offset = new Date().getTimezoneOffset() * 60000;
     const today = new Date(Date.now() - offset); // 예: 2025‑06‑19T...
     const dateOnly = today.toISOString().slice(0,8)+'01'; // "2025-06-"
@@ -55,21 +67,22 @@ else
     res.render('order',{title: 'ICECARE', request: req,orderList:[],cnt});
 })
 router.get('/reservation',async function (req, res) {
-
+    if(!req.session.user) return res.redirect('/');
     const {data, error} = await supa.from('reservation').select('*,user:customer!user_email(email,name,phone,addr,image_url)').eq('state', 3).is('gisa_email',null).order('date', {ascending: false});
 
     console.log("예약 목록 : ",data);
     if (error) {
         console.error('Error fetching reservations:', error);
-        res.status(500).render('reservation',{title: 'ICECARE', request: req, error: 'Failed to fetch reservations.', reservations: [],supabase_url: process.env.SUPABASE_URL, supabase_key: process.env.SUPABASE_KEY});
+        return res.status(500).render('reservation',{title: 'ICECARE', request: req, error: 'Failed to fetch reservations.', reservations: [],supabase_url: process.env.SUPABASE_URL, supabase_key: process.env.SUPABASE_KEY});
     }else{
         if(data?.length>0) {
-            res.status(200).render('reservation', {title: 'ICECARE', request: req, reservations: data,supabase_url: process.env.SUPABASE_URL, supabase_key: process.env.SUPABASE_KEY});
+            return res.status(200).render('reservation', {title: 'ICECARE', request: req, reservations: data,supabase_url: process.env.SUPABASE_URL, supabase_key: process.env.SUPABASE_KEY});
         }else
-            res.status(201).render('reservation', {title: 'ICECARE', request: req, reservations: [],supabase_url: process.env.SUPABASE_URL, supabase_key: process.env.SUPABASE_KEY});
+            return res.status(201).render('reservation', {title: 'ICECARE', request: req, reservations: [],supabase_url: process.env.SUPABASE_URL, supabase_key: process.env.SUPABASE_KEY});
     }
 })
 router.get('/history',async function (req, res) {
+    if(!req.session.user) return res.redirect('/');
     const month = req.query?.month || new Date().getMonth()+1;
     const offset = new Date().getTimezoneOffset() * 60000;
     const today = new Date(Date.now() - offset);
