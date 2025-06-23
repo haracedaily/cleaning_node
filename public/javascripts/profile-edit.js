@@ -220,10 +220,10 @@ async function handleFormSubmit(event) {
                     'Content-Type': 'application/json'
                 }
             });
-
-            if (result.data.status === 'success') {
+            console.log(result);
+            if (result.status === 200) {
                 showMessage('프로필이 성공적으로 업데이트되었습니다.', 'success');
-                // location.reload();
+                window.location.href='/';
             } else {
                 showMessage('프로필 업데이트에 실패했습니다.', 'error');
             }

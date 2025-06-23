@@ -123,7 +123,7 @@ router.post('/profileUpdate', async function (req, res) {
     }else{
         console.log(updateData);
         req.session.user = updateData[0];
-        res.status(200).json(updateData);
+        res.status(200).json(updateData[0]);
     }
 
 })
