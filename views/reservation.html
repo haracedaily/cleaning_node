@@ -95,6 +95,7 @@ function pickup(res_no) {
     axios.post("pick",{
         res_no
     }).then((response) => {
+        alert('배정 되었습니다.');
         console.log(response);
     }).catch((error) => {
         console.log(error);

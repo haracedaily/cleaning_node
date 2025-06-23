@@ -32,8 +32,8 @@ self.addEventListener('push', function(event) {
   const title = data.title || '알림';
   const options = {
     body: data.body || '',
-    icon: '/android-chrome-192x192.png', // 원하는 아이콘 경로로 수정
-    badge: '/android-chrome-192x192.png',
+    icon: '/icons/icon-192x192.png', // 원하는 아이콘 경로로 수정
+    badge: '/icons/icon-192x192.png',
     data: {
       url: data.url || '/'
     }
