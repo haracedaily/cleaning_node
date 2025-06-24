@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const {supa} = require('../utils/supa');
+const webpush = require('web-push');
 router.get('/',async function (req, res) {
 // 1. 오늘 00:00:00.000 UTC (또는 로컬 시간) 계산
     if(!req.session.user)return res.redirect('/');
@@ -102,6 +103,23 @@ router.get('/history',async function (req, res) {
 
 router.post('/pick',async function (req, res) {
     const result = await supa.from('reservation').update({gisa_email:req.session.user.mail,state:4}).eq("res_no",req.body.res_no);
+    if(req.session.user.alarm_yn) {
+        const pushSubscription = {
+            endpoint: req.session.user.endpoint,
+            keys: {
+                p256dh: req.session.user.p256dh,
+                auth: req.session.user.alarm_auth
+            }
+        }
+        await webpush.sendNotification(
+            pushSubscription,
+            JSON.stringify({
+                title: '청소 배정',
+                body: '새로운 청소가 배정 되었습니다',
+                url: '/'
+            })
+        );
+    }
     console.log("픽업 결과 : ",result);
     res.send(result);
 })
@@ -180,8 +198,26 @@ router.post('/complete',async function (req, res) {
             console.error('예약 상태 업데이트 오류:', updateError);
             return res.json({status: 'error', message: '상태 업데이트 중 오류가 발생했습니다.'});
         }
-        else
+        else{
+                if(req.session.user.alarm_yn) {
+                    const pushSubscription = {
+                        endpoint: req.session.user.endpoint,
+                        keys: {
+                            p256dh: req.session.user.p256dh,
+                            auth: req.session.user.alarm_auth
+                        }
+                    }
+                    await webpush.sendNotification(
+                        pushSubscription,
+                        JSON.stringify({
+                            title: '청소 완료',
+                            body: '배정한 청소가 완료처리되었습니다',
+                            url: '/'
+                        })
+                    );
+                }
         return res.json({status: 'success', message: '청소완료 처리가 성공적으로 완료되었습니다.'});
+        }
 
     } catch (error) {
         console.error('청소완료 처리 오류:', error);
