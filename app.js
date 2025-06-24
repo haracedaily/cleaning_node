@@ -7,6 +7,14 @@ const cookieParser = require('cookie-parser');
 const expressSession = require('express-session');
 const cors = require('cors');
 const {supa} = require('./utils/supa.js'); // supabase 유틸리티 모듈 불러오기
+const webpush = require('web-push');
+
+
+webpush.setVapidDetails(
+    'https://port-0-cleaning-node-managdgo41797b84.sel4.cloudtype.app/',
+    'BOT_DFjRezj8tblQM7jv_kn3zJP5ERkN45_sAGLtZ6qTFkeQQcZssZnKD0Ik2PZSgc0z-X3Wkl_RzmVnUDeYwNc',
+    '_CjmFMikm5WtFVQ1LnZ8x6dvbKm-H95AX2dK_F94RKo'
+)
 require('dotenv').config();
 
 const app = express();
