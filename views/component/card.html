@@ -1,4 +1,4 @@
-<div class="card" style="width: 95%; height:900px; margin: 1rem auto; border-radius: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+<div class="card" style="width: 95%; height:950px; margin: 1rem auto; border-radius: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
     <div class="card-body d-flex flex-row justify-content-between align-items-center" style="padding: 0.8rem 1rem; background:linear-gradient(0,#0084FF 5%, transparent 5%);">
         <i class="bi bi-box-arrow-left icon-hover-black" style="font-size: min(10vw,2rem); color: #0084ff; cursor:pointer; margin-right: 1rem; transition: transform 0.2s;" onclick="location.href='/user/logout'"></i>
         <div>
@@ -64,13 +64,13 @@
 <script>
     function cardUpside(el){
         const parent = el.parentNode.parentNode;
-        if(parent.style.height === '100px') {
-            parent.style.height = '900px';
+        if(parent.style.height === '150px') {
+            parent.style.height = '950px';
             el.style.animation="toggle-upside 2s infinite";
 
         }
         else {
-            parent.style.height = '100px';
+            parent.style.height = '150px';
             el.style.animation="toggle-downside 2s infinite";
         }
 

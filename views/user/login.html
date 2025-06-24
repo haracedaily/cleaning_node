@@ -58,7 +58,7 @@
                     const reg = await navigator.serviceWorker.register('/service-worker.js');
                     let subscription = await reg.pushManager.getSubscription();
                     if (!subscription) {
-                        const vapidPublicKey = 'BN3RBQuvSX2hPCzy_BPJJ9fDtp0kMVGz5QSVFiTzC4Fm3IyHWUCpbzV6dfLOVYzXTwqJEi4gZc0oE02Y1lJ8iVo';
+                        const vapidPublicKey = 'BOT_DFjRezj8tblQM7jv_kn3zJP5ERkN45_sAGLtZ6qTFkeQQcZssZnKD0Ik2PZSgc0z-X3Wkl_RzmVnUDeYwNc';
                         const convertedVapidKey = urlBase64ToUint8Array(vapidPublicKey);
                         subscription = await reg.pushManager.subscribe({
                             userVisibleOnly: true,
