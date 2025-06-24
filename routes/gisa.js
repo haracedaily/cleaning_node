@@ -111,6 +111,8 @@ router.post('/pick',async function (req, res) {
                 auth: req.session.user.alarm_auth
             }
         }
+        try {
+
         await webpush.sendNotification(
             pushSubscription,
             JSON.stringify({
@@ -119,6 +121,10 @@ router.post('/pick',async function (req, res) {
                 url: '/'
             })
         );
+            console.log('푸시 알림 전송 성공');
+        }catch(e) {
+            console.error('푸시 알림 전송 실패:', e);
+        }
     }
     console.log("픽업 결과 : ",result);
     res.send(result);
