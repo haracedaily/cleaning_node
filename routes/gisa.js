@@ -220,7 +220,7 @@ router.post('/complete',async function (req, res) {
                             body: '배정한 청소가 완료처리되었습니다',
                             url: '/'
                         })
-                    );
+                    ).then(res=>console.log('알림 성공')).catch(e=>console.log("알림 실패",e));
                 }
         return res.json({status: 'success', message: '청소완료 처리가 성공적으로 완료되었습니다.'});
         }
