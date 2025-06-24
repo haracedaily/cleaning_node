@@ -12,8 +12,8 @@ const webpush = require('web-push');
 
 webpush.setVapidDetails(
     'https://port-0-cleaning-node-managdgo41797b84.sel4.cloudtype.app/',
-    'BHfTnH34XmgUuUi17SNrKXTUnuNfNReUQ2vKpoNjWkYq7OUmVlKxmYCF03Q_bVPWr_a2tmO3s6IT2af_PmCvKfg',
-    'dSJKI9Bv0Exidqeucmqo4IqASIEdD7thSmxbehTQUuI'
+    'BBAM2GOE13h59ZDNqToC23HdNafs2eypet_bh6sRh0wvxIbZknpiVijBqrSealSwYBkBLyTE_DTQmzmp8yTDCZE',
+    'MPrJJYxypgckCHa45ylTc_2z71QUfpy58NOMWf2E2OQ'
 )
 require('dotenv').config();
 
