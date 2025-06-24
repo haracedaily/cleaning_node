@@ -1,11 +1,11 @@
 const $modal = document.querySelector('#completionModal');
 let currentReservation = null;
 
-function modal_open(res_no, user_name, date, time, model, addr, mode = 'complete', details = {}) {
+function modal_open(res_no, user_name, date, time, model, addr, phone,mode = 'complete', details = {}) {
     const preview = document.getElementById('filePreview');
     preview.innerHTML = '';
-    console.log('모달 열기:', res_no, user_name, date, time, model, addr, mode);
-    currentReservation = {res_no, user_name, date, time, model, addr};
+    console.log('모달 열기:', res_no, user_name, date, time, model, addr, mode,phone);
+    currentReservation = {res_no, user_name, date, time, model, addr,phone};
 
 // 모달 내용 업데이트
     document.getElementById('modalUserName').textContent = user_name;
@@ -13,6 +13,7 @@ function modal_open(res_no, user_name, date, time, model, addr, mode = 'complete
     document.getElementById('modalTime').textContent = time;
     document.getElementById('modalModel').textContent = model;
     document.getElementById('modalAddr').textContent = addr;
+    document.getElementById('modalHiddenPhone').value = phone;
 
     const modalContent = document.getElementById('modalContent');
     const modalImage = document.getElementById('modalImage');
@@ -43,7 +44,7 @@ function modal_open(res_no, user_name, date, time, model, addr, mode = 'complete
         confirmBtn.innerHTML = '<i class="bi bi-pencil-square"></i> 수정';
         confirmBtn.onclick = () => {
             // TODO: 수정 기능 구현
-            modal_open(res_no, user_name, date, time, model, addr, 'complete', details);
+            modal_open(res_no, user_name, date, time, model, addr,phone, 'complete', details);
         };
 
     } else { // 'complete' 모드
@@ -51,7 +52,7 @@ function modal_open(res_no, user_name, date, time, model, addr, mode = 'complete
         modalContent.readOnly = false;
         modalImage.value = '';
         modalImage.style.display = 'block';
-
+        document.getElementById('modalHiddenPhone').value = phone;
         confirmBtn.innerHTML = '<i class="bi bi-check2-circle"></i> 청소 완료 확인';
         confirmBtn.onclick = () => confirmCompletion(confirmBtn);
     }
@@ -71,6 +72,7 @@ function modalClose() {
 async function confirmCompletion(submitBtn) {
     currentReservation.files = document.getElementById('modalImage').files;
     currentReservation.memo = document.getElementById('modalContent').value;
+    currentReservation.phone = document.getElementById('modalHiddenPhone').value;
 
     try {
 // 파일들을 Base64로 변환

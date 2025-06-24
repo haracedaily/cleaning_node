@@ -24,7 +24,7 @@
                 <i class="bi bi-person-circle"></i>
                 <span class="res-value">{{ reservation.user.name }}</span>
             </div>
-            <button class="res-btn" onclick="lookup('{{reservation.res_no}}', '{{ reservation.user.name }}', '{{ reservation.date.slice(0,10) }}', '{{ reservation.time }}', '{{ reservation.model }}', '{{ reservation.addr or reservation.user.addr }}', '{{reservation.work.memo}}','{{reservation.work.images_url}}')">
+            <button class="res-btn" onclick="lookup('{{reservation.res_no}}', '{{ reservation.user.name }}', '{{ reservation.date.slice(0,10) }}', '{{ reservation.time }}', '{{ reservation.model }}', '{{ reservation.addr or reservation.user.addr }}', '{{reservation.work.memo}}','{{reservation.work.images_url}}','{{reservation.user.phone}}')">
                 <i class="bi bi-check2-circle"></i>
                 보고확인
             </button>

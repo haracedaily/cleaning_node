@@ -32,7 +32,7 @@
             </span>
             </div>
             {% if today.state !==5 %}
-            <button class="res-btn" onclick="modal_open('{{today.res_no}}', '{{today.user.name}}', '{{today.date.slice(0,10)}}', '{{today.time}}', '{{today.model}}', '{{today.addr or today.user.addr}}')">
+            <button class="res-btn" onclick="modal_open('{{today.res_no}}', '{{today.user.name}}', '{{today.date.slice(0,10)}}', '{{today.time}}', '{{today.model}}', '{{today.addr or today.user.addr}}', '{{today.user.phone}}')">
                 <i class="bi bi-check2-circle"></i>
                 청소완료
             </button>
