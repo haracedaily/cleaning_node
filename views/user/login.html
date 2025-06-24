@@ -58,7 +58,7 @@
                     const reg = await navigator.serviceWorker.register('/service-worker.js');
                     let subscription = await reg.pushManager.getSubscription();
                     if (!subscription) {
-                        const vapidPublicKey = 'BOT_DFjRezj8tblQM7jv_kn3zJP5ERkN45_sAGLtZ6qTFkeQQcZssZnKD0Ik2PZSgc0z-X3Wkl_RzmVnUDeYwNc';
+                        const vapidPublicKey = 'BHfTnH34XmgUuUi17SNrKXTUnuNfNReUQ2vKpoNjWkYq7OUmVlKxmYCF03Q_bVPWr_a2tmO3s6IT2af_PmCvKfg';
                         const convertedVapidKey = urlBase64ToUint8Array(vapidPublicKey);
                         subscription = await reg.pushManager.subscribe({
                             userVisibleOnly: true,
@@ -74,8 +74,8 @@
         })();
 
         function urlBase64ToUint8Array(base64String) {
-            const padding = '='.repeat((4 - base64String.length % 4) % 4);
-            const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+            const padding = '='.repeat((4 - base64String.length % 4) % 4); // = 패딩처리
+            const base64 = (base64String + padding).replaceAll(/-/g, '+').replaceAll(/_/g, '/'); // -과 _ +와 /로 처리
             const rawData = window.atob(base64);
             const outputArray = new Uint8Array(rawData.length);
             for (let i = 0; i < rawData.length; ++i) {
