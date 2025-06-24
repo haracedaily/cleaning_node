@@ -25,7 +25,7 @@ self.addEventListener('pushsubscriptionchange', event => {
 
     const newSub = await self.registration.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array('BHfTnH34XmgUuUi17SNrKXTUnuNfNReUQ2vKpoNjWkYq7OUmVlKxmYCF03Q_bVPWr_a2tmO3s6IT2af_PmCvKfg')
+      applicationServerKey: urlBase64ToUint8Array('BBAM2GOE13h59ZDNqToC23HdNafs2eypet_bh6sRh0wvxIbZknpiVijBqrSealSwYBkBLyTE_DTQmzmp8yTDCZE')
     });
 
     if (newSub) {
