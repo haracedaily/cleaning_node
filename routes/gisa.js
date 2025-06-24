@@ -25,7 +25,7 @@ router.get('/',async function (req, res) {
     console.log(payError);
     const { data, error } = await supa
         .from('reservation')
-        .select('*')
+        .select('*,user:customer!user_email(email,name,phone,addr,image_url)')
         .eq('gisa_email', req.session.user.mail)
         .gte('date', start)
         .lte('date', end);
@@ -103,6 +103,32 @@ router.get('/history',async function (req, res) {
 
 router.post('/pick',async function (req, res) {
     const result = await supa.from('reservation').update({gisa_email:req.session.user.mail,state:4}).eq("res_no",req.body.res_no);
+    const {data:end_data} = await supa.from('push_subscribe').select('*').in('phone',[req.body.phone,'admin']);
+    if(end_data.length>0){
+        end_data.map(async el=>{
+            const pushSubscription = {
+                endpoint: el.endpoint,
+                keys: {
+                    p256dh: el.p256dh,
+                    auth: el.auth
+                }
+            }
+            try {
+
+                await webpush.sendNotification(
+                    pushSubscription,
+                    JSON.stringify({
+                        title: '청소기사가 배정되었습니다.',
+                        body: el.phone==='admin'?`${result.res_no}번 예약에 청소기사가 배정되었습니다.`:'예약하신 청소 건에 청소기사가 배정 되었습니다',
+                        url: el.phone==='admin'?'https://mini-project06-ice-admin.vercel.app/': 'https://port-0-icemobile-manaowvf213a09cd.sel4.cloudtype.app/'
+                    })
+                );
+                console.log('푸시 알림 전송 성공');
+            }catch(e) {
+                console.error('푸시 알림 전송 실패:', e);
+            }
+        });
+    }
     if(req.session.user.alarm_yn) {
         const pushSubscription = {
             endpoint: req.session.user.endpoint,
@@ -205,6 +231,36 @@ router.post('/complete',async function (req, res) {
             return res.json({status: 'error', message: '상태 업데이트 중 오류가 발생했습니다.'});
         }
         else{
+
+            const {data:end_data} = await supa.from('push_subscribe').select('*').in('phone',[req.body.phone,'admin']);
+            if(end_data.length>0){
+                end_data.map(async el=>{
+                    const pushSubscription = {
+                        endpoint: el.endpoint,
+                        keys: {
+                            p256dh: el.p256dh,
+                            auth: el.auth
+                        }
+                    }
+                    try {
+
+                        await webpush.sendNotification(
+                            pushSubscription,
+                            JSON.stringify({
+                                title: '청소가 완료되었습니다.',
+                                body: el.phone==='admin'?`${result.res_no}번 예약의 청소가 완료되었습니다.`:'예약하신 청소 건의 청소가 완료되었습니다',
+                                url: el.phone==='admin'?'https://mini-project06-ice-admin.vercel.app/': 'https://port-0-icemobile-manaowvf213a09cd.sel4.cloudtype.app/'
+                            })
+                        );
+                        console.log('푸시 알림 전송 성공');
+                    }catch(e) {
+                        console.error('푸시 알림 전송 실패 사용자 및 관리자 :', e);
+                    }
+                });
+            }
+
+
+
                 if(req.session.user.alarm_yn) {
                     const pushSubscription = {
                         endpoint: req.session.user.endpoint,

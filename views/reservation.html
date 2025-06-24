@@ -11,7 +11,7 @@
                 <i class="bi bi-person-circle"></i>
                 <span class="res-value">{{ reservation.user.name }}</span>
             </div>
-            <button class="res-btn" onclick="pickup({{reservation.res_no}})">
+            <button class="res-btn" onclick="pickup('{{reservation.res_no}}','{{reservation.user.phone}}')">
                 <i class="bi bi-check2-circle"></i>
                 청소배정
             </button>
@@ -90,10 +90,11 @@
 }*/
 
 
-function pickup(res_no) {
+function pickup(res_no,phone) {
     console.log(res_no);
     axios.post("pick",{
-        res_no
+        res_no,
+        phone
     }).then((response) => {
         Swal.fire({
             position: "center",
