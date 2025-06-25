@@ -28,7 +28,8 @@ router.get('/',async function (req, res) {
         .select('*,user:customer!user_email(email,name,phone,addr,image_url)')
         .eq('gisa_email', req.session.user.mail)
         .gte('date', start)
-        .lte('date', end);
+        .lte('date', end)
+        .order('state', { ascending: true }).order('date', { ascending: false });
 
     console.log("today : ",data);
 
@@ -59,7 +60,7 @@ router.get('/order', async function (req, res) {
     const dateOnly = today.toISOString().slice(0,8)+'01'; // "2025-06-"
     const start = dateOnly + 'T00:00:00Z';
     // console.log("오더 조회 로그인 계정 확인 : ",req.session.user.mail);
-    const {data,error} = await supa.from('reservation').select('*,user:customer!user_email(email,name,phone,addr,image_url)').eq('gisa_email',req.session.user.mail.trim()).gte('date', start);
+    const {data,error} = await supa.from('reservation').select('*,user:customer!user_email(email,name,phone,addr,image_url)').eq('gisa_email',req.session.user.mail.trim()).gte('date', start).order('state', { ascending: true }).order('date', { ascending: false });
     // console.log("배정된 예약 건 : ",data);
     const cnt = [...data].filter(el=>el.state!==5)?.length;
 if(!error)
@@ -70,6 +71,7 @@ else
 router.get('/reservation',async function (req, res) {
     if(!req.session.user) return res.redirect('/');
     const {data, error} = await supa.from('reservation').select('*,user:customer!user_email(email,name,phone,addr,image_url)').eq('state', 3).is('gisa_email',null).order('date', {ascending: false});
+
 
     console.log("예약 목록 : ",data);
     if (error) {
@@ -94,15 +96,17 @@ router.get('/history',async function (req, res) {
     const start = today.toISOString().slice(0,8)+'01T00:00:00Z';
     const last = new Date(today.getFullYear(), month, 0).toISOString().slice(0,10)+'T23:59:59Z';
     if(!req.session?.user) res.redirect('/');
-    const {data:history,error} = await supa.from('reservation').select('*,user:customer!user_email(email,name,phone,addr,image_url),work:ice_work!res_no(memo,images_url)').eq('state',5).eq('gisa_email',req.session.user.mail).gte('date',start).lte('date',last);
+    const {data:history,error} = await supa.from('reservation').select('*,user:customer!user_email(email,name,phone,addr,image_url),work:ice_work!res_no(memo,images_url)').eq('state',5).eq('gisa_email',req.session.user.mail).gte('date',start).lte('date',last).order('date', { ascending: false });
+    const {data:totalPrice,err} = await supa.from('reservation').select('price.sum()').eq('state',5).eq('gisa_email',req.session.user.mail).gte('date',start).lte('date',last);
+    console.log("해당 월의 총 금액",totalPrice[0]);
     if(!error)
-    res.render('history',{title: 'ICECARE', request: req, month,history});
+    res.render('history',{title: 'ICECARE', request: req, month,history,payment:parseInt(totalPrice[0].sum*0.7).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')});
     else
-        res.render('history',{title: 'ICECARE', request: req, month,history:[]});
+        res.render('history',{title: 'ICECARE', request: req, month,history:[],payment:0});
 })
 
 router.post('/pick',async function (req, res) {
-    const result = await supa.from('reservation').update({gisa_email:req.session.user.mail,state:4}).eq("res_no",req.body.res_no);
+    const result = await supa.from('reservation').update({gisa_email:req.session.user.mail,state:4}).eq("res_no",req.body.res_no).select();
     const {data:end_data} = await supa.from('push_subscribe').select('*').in('phone',[req.body.phone,'admin']);
     if(end_data.length>0){
         end_data.map(async el=>{
@@ -114,12 +118,12 @@ router.post('/pick',async function (req, res) {
                 }
             }
             try {
-
+                console.log("배정된 결과 : ",result);
                 await webpush.sendNotification(
                     pushSubscription,
                     JSON.stringify({
                         title: '청소기사가 배정되었습니다.',
-                        body: el.phone==='admin'?`${result.res_no}번 예약에 청소기사가 배정되었습니다.`:'예약하신 청소 건에 청소기사가 배정 되었습니다',
+                        body: el.phone==='admin'?`${result.data[0].res_no}번 예약에 청소기사가 배정되었습니다.`:'예약하신 청소 건에 청소기사가 배정 되었습니다',
                         url: el.phone==='admin'?'https://mini-project06-ice-admin.vercel.app/': 'https://port-0-icemobile-manaowvf213a09cd.sel4.cloudtype.app/'
                     })
                 );
@@ -220,18 +224,18 @@ router.post('/complete',async function (req, res) {
         }
 
         // 예약 상태를 '청소완료'로 업데이트
-        const {error: updateError} = await supa
+        const {data:updateData,error: updateError} = await supa
             .from('reservation')
             .update({'state': 5})
             .eq('res_no', res_no)
-        .eq('gisa_email',req.session.user.id);
+        .eq('gisa_email',req.session.user.id).select();
 
         if (updateError) {
             console.error('예약 상태 업데이트 오류:', updateError);
             return res.json({status: 'error', message: '상태 업데이트 중 오류가 발생했습니다.'});
         }
         else{
-
+            console.log("청소 완료 업데이트 값 : ",updateData);
             const {data:end_data} = await supa.from('push_subscribe').select('*').in('phone',[req.body.phone,'admin']);
             if(end_data.length>0){
                 end_data.map(async el=>{
@@ -248,7 +252,7 @@ router.post('/complete',async function (req, res) {
                             pushSubscription,
                             JSON.stringify({
                                 title: '청소가 완료되었습니다.',
-                                body: el.phone==='admin'?(req.body.phone?`${result.res_no}번 예약의 청소가 완료되었습니다.`:`${result.res_no}번 예약의 보고가 수정되었습니다.`):'예약하신 청소 건의 청소가 완료되었습니다',
+                                body: el.phone==='admin'?(req.body.phone?`${updateData[0].res_no}번 예약의 청소가 완료되었습니다.`:`${updateData[0].res_no}번 예약의 보고가 수정되었습니다.`):'예약하신 청소 건의 청소가 완료되었습니다',
                                 url: el.phone==='admin'?'https://mini-project06-ice-admin.vercel.app/': 'https://port-0-icemobile-manaowvf213a09cd.sel4.cloudtype.app/'
                             })
                         );
@@ -260,7 +264,7 @@ router.post('/complete',async function (req, res) {
             }
 
 
-
+                console.log("배송기사 알람 여부 : ",req.session.user.alarm_yn);
                 if(req.session.user.alarm_yn) {
                     const pushSubscription = {
                         endpoint: req.session.user.endpoint,
@@ -269,6 +273,7 @@ router.post('/complete',async function (req, res) {
                             auth: req.session.user.alarm_auth
                         }
                     }
+                    console.log("배송기사 알람 데이터 : ",pushSubscription);
                     await webpush.sendNotification(
                         pushSubscription,
                         JSON.stringify({
