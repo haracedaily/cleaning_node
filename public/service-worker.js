@@ -12,32 +12,7 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', event => {
   console.log('[Service Worker] Activated');
 });
-self.addEventListener('pushsubscriptionchange', event => {
-  event.waitUntil((async () => {
-    if (event.oldSubscription) {
-      // 기존 구독을 서버에서 삭제 요청
-      await fetch('/delete-subscription', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({ endpoint: event.oldSubscription.endpoint })
-      });
-    }
 
-    const newSub = await self.registration.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array('BBAM2GOE13h59ZDNqToC23HdNafs2eypet_bh6sRh0wvxIbZknpiVijBqrSealSwYBkBLyTE_DTQmzmp8yTDCZE')
-    });
-
-    if (newSub) {
-      // 새 구독 정보를 서버에 전송
-      await fetch('/save-subscription', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify(newSub.toJSON())
-      });
-    }
-  })());
-});
 // 오프라인에서 처리 요청되면
 self.addEventListener('fetch', event => {
   // 기본 네트워크 요청 처리
