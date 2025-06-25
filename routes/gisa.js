@@ -248,7 +248,7 @@ router.post('/complete',async function (req, res) {
                             pushSubscription,
                             JSON.stringify({
                                 title: '청소가 완료되었습니다.',
-                                body: el.phone==='admin'?`${result.res_no}번 예약의 청소가 완료되었습니다.`:'예약하신 청소 건의 청소가 완료되었습니다',
+                                body: el.phone==='admin'?(req.body.phone?`${result.res_no}번 예약의 청소가 완료되었습니다.`:`${result.res_no}번 예약의 보고가 수정되었습니다.`):'예약하신 청소 건의 청소가 완료되었습니다',
                                 url: el.phone==='admin'?'https://mini-project06-ice-admin.vercel.app/': 'https://port-0-icemobile-manaowvf213a09cd.sel4.cloudtype.app/'
                             })
                         );

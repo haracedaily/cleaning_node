@@ -44,7 +44,7 @@ function modal_open(res_no, user_name, date, time, model, addr, phone,mode = 'co
         confirmBtn.innerHTML = '<i class="bi bi-pencil-square"></i> 수정';
         confirmBtn.onclick = () => {
             // TODO: 수정 기능 구현
-            modal_open(res_no, user_name, date, time, model, addr,phone, 'complete', details);
+            modal_open(res_no, user_name, date, time, model, addr,null, 'complete', details);
         };
 
     } else { // 'complete' 모드

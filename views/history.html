@@ -76,7 +76,7 @@ function reSearchHistory(){
     window.location.href = "?month="+$select.value;
 }
 
-async function lookup(res_no, user_name, date, time, model, addr, memo, files){
+async function lookup(res_no, user_name, date, time, model, addr, memo, files, phone){
     // TODO: 서버로부터 완료 상세 정보 가져오기
     // 예: const response = await axios.get(`/gisa/completion/${res_no}`);
     // const completionDetails = response.data;
@@ -86,7 +86,7 @@ async function lookup(res_no, user_name, date, time, model, addr, memo, files){
         files: files?.length>0?files.split(','):[] // 실제로는 이미지 URL 목록이 와야 함
     };
     console.log("왜 여기로 들어감",addr);
-    modal_open(res_no, user_name, date, time, model, addr, 'history', completionDetails);
+    modal_open(res_no, user_name, date, time, model, addr, phone, 'history', completionDetails);
 }
 </script>
 {% endblock %}
