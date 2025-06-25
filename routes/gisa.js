@@ -71,8 +71,6 @@ else
 router.get('/reservation',async function (req, res) {
     if(!req.session.user) return res.redirect('/');
     const {data, error} = await supa.from('reservation').select('*,user:customer!user_email(email,name,phone,addr,image_url)').eq('state', 3).is('gisa_email',null).order('date', {ascending: false});
-
-
     console.log("예약 목록 : ",data);
     if (error) {
         console.error('Error fetching reservations:', error);
@@ -124,7 +122,7 @@ router.post('/pick',async function (req, res) {
                     JSON.stringify({
                         title: '청소기사가 배정되었습니다.',
                         body: el.phone==='admin'?`${result.data[0].res_no}번 예약에 청소기사가 배정되었습니다.`:'예약하신 청소 건에 청소기사가 배정 되었습니다',
-                        url: el.phone==='admin'?'https://mini-project06-ice-admin.vercel.app/': 'https://port-0-icemobile-manaowvf213a09cd.sel4.cloudtype.app/'
+                        url: el.phone==='admin'?'https://mini-project06-ice-admin.vercel.app/': `https://port-0-icemobile-manaowvf213a09cd.sel4.cloudtype.app/reservation/${result.data[0].res_no}`
                     })
                 );
                 console.log('푸시 알림 전송 성공');
@@ -254,7 +252,7 @@ router.post('/complete',async function (req, res) {
                             JSON.stringify({
                                 title: '청소가 완료되었습니다.',
                                 body: el.phone==='admin'?(req.body.phone?`${updateData[0].res_no}번 예약의 청소가 완료되었습니다.`:`${updateData[0].res_no}번 예약의 보고가 수정되었습니다.`):'예약하신 청소 건의 청소가 완료되었습니다',
-                                url: el.phone==='admin'?'https://mini-project06-ice-admin.vercel.app/': 'https://port-0-icemobile-manaowvf213a09cd.sel4.cloudtype.app/'
+                                url: el.phone==='admin'?'https://mini-project06-ice-admin.vercel.app/': `https://port-0-icemobile-manaowvf213a09cd.sel4.cloudtype.app/reservation/${updateData[0].res_no}`
                             })
                         );
                         console.log('푸시 알림 전송 성공');
