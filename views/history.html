@@ -3,10 +3,7 @@
 {% block content %}
 <div class="container">
     <div class="page-title">작업 이력
-        <div style="font-size:1rem;">
-            <i class="bi bi-coin" style="color:#0084ff;"></i>
-            {{month}}월 합계 : {{payment}}원
-        </div>
+
         <div class="page-select">
             <select class="form-select" id="autoSizingSelect">
                 {% for i in range(1,13) %}
@@ -19,6 +16,10 @@
             </select>
             <button class="res-btn" onclick="reSearchHistory()">조회</button>
         </div>
+    </div>
+    <div class="p-2" style="font-size:1rem;">
+        <i class="bi bi-coin" style="color:#0084ff;"></i>
+        {{month}}월 합계 : {{payment}}원
     </div>
     {% if history.length>0 %}
     {% for reservation in history %}
@@ -274,7 +275,7 @@ async function lookup(res_no, user_name, date, time, model, addr, memo, files, p
         font-size: 1.3rem;
         font-weight: 600;
         color: #2d3436;
-        margin: 0.5rem 0 1rem 0.5rem;
+        margin: 0.5rem 0 0.1rem 0.5rem;
         position: relative;
         padding-left: 0.8rem;
     }
