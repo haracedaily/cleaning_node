@@ -64,13 +64,13 @@
 <script>
     function cardUpside(el){
         const parent = el.parentNode.parentNode;
-        if(parent.style.height === '150px') {
+        if(parent.style.height === '120px') {
             parent.style.height = '950px';
             el.style.animation="toggle-upside 2s infinite";
 
         }
         else {
-            parent.style.height = '150px';
+            parent.style.height = '120px';
             el.style.animation="toggle-downside 2s infinite";
         }
 
