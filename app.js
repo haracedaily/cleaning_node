@@ -15,6 +15,11 @@ webpush.setVapidDetails(
     'BBAM2GOE13h59ZDNqToC23HdNafs2eypet_bh6sRh0wvxIbZknpiVijBqrSealSwYBkBLyTE_DTQmzmp8yTDCZE',
     'MPrJJYxypgckCHa45ylTc_2z71QUfpy58NOMWf2E2OQ'
 )
+// webpush.setVapidDetails(
+//     'https://localhost:4020',
+//     "BBAM2GOE13h59ZDNqToC23HdNafs2eypet_bh6sRh0wvxIbZknpiVijBqrSealSwYBkBLyTE_DTQmzmp8yTDCZE",
+//     "MPrJJYxypgckCHa45ylTc_2z71QUfpy58NOMWf2E2OQ"
+// );
 require('dotenv').config();
 
 const app = express();
