@@ -246,6 +246,7 @@ router.post('/complete',async function (req, res) {
                             auth: el.auth
                         }
                     }
+
                     try {
 
                         await webpush.sendNotification(
