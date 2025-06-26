@@ -26,8 +26,12 @@ router.post('/login', async function (req, res) {
                 console.log('조회 내용',result.data);
                 console.log(req.session);
             }
+            if(result.data.indentify){
             req.session.user.nm = result.data.nm;
             res.status(200).json({status: 'success', user: data.user});
+            }
+            else
+                res.status(500).json({status: 'negative',message:"아직 승인처리되지 않은 아이디입니다. 관리자에게 문의해주세요."});
         }
     });
 });
