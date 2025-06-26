@@ -54,7 +54,7 @@ router.post('/send',async(req,res)=>{
                     url: `/`
                 })
             );
-            
+
             }
             console.log('푸시 알림 전송 성공');
             res.status(200).send({message:"success"});
