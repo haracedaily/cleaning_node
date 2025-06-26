@@ -55,11 +55,13 @@ const gisaRouter = require('./routes/gisa');
 const signupRouter = require('./routes/signup');
 const agreeRouter = require('./routes/agree');
 const userRouter = require('./routes/user');
+const subscribeRouter = require('./routes/subscribe');
 
 app.use("/gisa", gisaRouter);
 app.use("/signup", signupRouter);
 app.use('/agree', agreeRouter);
 app.use('/user', userRouter);
+app.use('/subscribe',subscribeRouter );
 
 app.get('/', function (req, res) {
     console.log('초기 페이지 : ', req.session);
