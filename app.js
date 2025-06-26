@@ -73,6 +73,12 @@ app.get('/', function (req, res) {
     res.render('user/login',{title: '로그인', request: req});
     }
 })
+app.post('/card-toggle',async (req,res)=>{
+    const {card_height} = req.body;
+    if(card_height)
+    req.session.card_height = card_height;
+    res.send('ok');
+})
 
 /* 미들웨어 장착 끝 */
 app.use((req,res,next)=>{

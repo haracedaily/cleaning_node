@@ -1,4 +1,8 @@
+{% if request.session.card_height %}
+<div class="card" style="width: 95%; height:{{request.session.card_height}}; margin: 1rem auto; border-radius: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+{% else %}
 <div class="card" style="width: 95%; height:1200px; margin: 1rem auto; border-radius: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+{% endif %}
     <div class="card-body d-flex flex-row justify-content-between align-items-center" style="padding: 0.8rem 1rem; background:linear-gradient(0,#0084FF 5%, transparent 5%);">
         <i class="bi bi-box-arrow-left icon-hover-black" style="font-size: min(10vw,2rem); color: #0084ff; cursor:pointer; margin-right: 1rem; transition: transform 0.2s;" onclick="location.href='/user/logout'"></i>
         <div>
@@ -56,7 +60,11 @@
         </div>
     </div>
     <div style="position:absolute; bottom: 0; z-index: 1; width: 100%; height: 1rem; display: flex; align-items: center; justify-content: center; margin-bottom: 0.1rem;">
+        {% if request.session.card_height === '105px' %}
+        <div style="padding:1rem;animation:toggle-downside 2s infinite;" onclick="cardUpside(this)">
+        {% else %}
         <div style="padding:1rem;animation:toggle-upside 2s infinite;" onclick="cardUpside(this)">
+            {% endif %}
             <div id="card-upside" style="cursor:pointer; border-top:3px solid black; border-right:3px solid black; width: 10px; height: 10px; display:flex; justify-content: center; align-items: center; ">
             <div style="border-top:3px solid black; border-right:3px solid black; width: 5px; height: 5px;"></div>
             </div>
@@ -64,8 +72,9 @@
     </div>
 </div>
 <script>
-    function cardUpside(el){
+    async function cardUpside(el){
         const parent = el.parentNode.parentNode;
+        
         if(parent.style.height === '105px') {
             parent.style.height = '1200px';
             el.style.animation="toggle-upside 2s infinite";
@@ -75,6 +84,8 @@
             parent.style.height = '105px';
             el.style.animation="toggle-downside 2s infinite";
         }
+        let card_height = parent.style.height;
+        axios.post('/card-toggle',{card_height})
 
     }
 </script>
@@ -122,7 +133,7 @@
         transform: translateY(-5px) rotate(-225deg);
     }
     100%{
-        transform: translateY(0) rotate(-180deg);
+        transform: translateY(0) rotate(-225deg);
     }
 }
 @media (max-width: 600px) {
