@@ -28,7 +28,6 @@ router.post('/send',async(req,res)=>{
                         auth: user_push.auth
                     }
                 }
-
                 await webpush.sendNotification(
                     pushSubscription,
                     JSON.stringify({
@@ -39,6 +38,8 @@ router.post('/send',async(req,res)=>{
                 );
 
             }
+
+            if(gisa_data.endpoint){
             await webpush.sendNotification(
                 {
                     endpoint:gisa_data.endpoint,
@@ -53,6 +54,8 @@ router.post('/send',async(req,res)=>{
                     url: `/`
                 })
             );
+            
+            }
             console.log('푸시 알림 전송 성공');
             res.status(200).send({message:"success"});
         }catch (e) {
