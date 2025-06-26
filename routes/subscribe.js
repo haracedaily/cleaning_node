@@ -4,7 +4,19 @@ const {supa} = require('../utils/supa');
 const webpush = require('web-push');
 
 router.post('/send',async(req,res)=>{
-    const {gisa_data,phone,res_data} = req.body;
+    let {gisa_data,phone,res_data} = req.body;
+    gisa_data = JSON.parse(gisa_data);
+    res_data = JSON.parse(res_data);
+    console.log(req.body);
+    console.log(gisa_data);
+    console.log(res_data);
+    console.log({
+        endpoint:gisa_data.endpoint,
+        keys:{
+            p256dh: gisa_data.p256dh,
+            auth: gisa_data.alarm_auth
+        }
+    });
     const {data:user_push,err} = await supa.from("push_subscribe").select().eq('phone',phone).single();
     if(user_push){
         try{
@@ -34,14 +46,14 @@ router.post('/send',async(req,res)=>{
                 },
                 JSON.stringify({
                     title: '청소예약이 배정되었습니다.',
-                    body: `${res_data.date} 처리해야할 예약이 배정 되었습니다`,
+                    body: `${res_data.date.slice(0,10)} 처리해야할 예약이 배정 되었습니다`,
                     url: `/`
                 })
             );
             console.log('푸시 알림 전송 성공');
-
+            res.status(200).send({message:"success"});
         }catch (e) {
-            
+            res.status(500).send({message:"fail"});
         }
     }
 })
