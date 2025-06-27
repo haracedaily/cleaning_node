@@ -129,7 +129,8 @@
                         timer: 1000
                     });
                     location.href = '/gisa';
-                } else {
+                }
+                else {
                     Swal.fire({
                         position: "center",
                         icon: "warning",
@@ -144,7 +145,7 @@
                 Swal.fire({
                     position: "center",
                     icon: "error",
-                    title: "로그인 중 오류가 발생하였습니다. 종료 후 재시도하여주세요.",
+                    title: error.response.data.message||"로그인 중 오류가 발생하였습니다. 종료 후 재시도하여주세요.",
                     showConfirmButton: false,
                     timer: 1000
                 });
