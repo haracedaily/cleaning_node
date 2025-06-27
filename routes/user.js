@@ -20,13 +20,14 @@ router.post('/login', async function (req, res) {
             console.log('업데이트 결과 : ',result);
             }
                 const result = await supa.from('member').select('*').eq('mail', req.body.id).single();
-                req.session.user = result.data;
+
             if (req.body.autoLogin) {
                 console.log('조회 내용', req.body.id);
                 console.log('조회 내용',result.data);
                 console.log(req.session);
             }
             if(result.data.indentify){
+                req.session.user = result.data;
             req.session.user.nm = result.data.nm;
             res.status(200).json({status: 'success', user: data.user});
             }
@@ -34,6 +35,15 @@ router.post('/login', async function (req, res) {
                 res.status(500).json({status: 'negative',message:"아직 승인처리되지 않은 아이디입니다. 관리자에게 문의해주세요."});
         }
     }).catch(err=>{
+        req.session.destroy(err => {
+            res.clearCookie('session-cookie');
+            if (err) {
+                console.error('세션 삭제 중 오류:', err);
+            } else {
+                console.log('세션 삭제 성공');
+            }
+            console.log('logout error:', err);
+        });
             console.error('로그인 에러:', err);
             res.status(401).json({status: 'error', message: "비밀번호 및 아이디를 확인해주세요."});
 
