@@ -12,7 +12,7 @@ router.post('/login', async function (req, res) {
     }).then(async ({data, error}) => {
         if (error) {
             console.error('로그인 에러:', error);
-            res.status(401).json({status: 'error', message: error.message});
+            res.status(401).json({status: 'error', message: "비밀번호 및 아이디를 확인해주세요."});
         } else {
             console.log('로그인 성공:', data);
             if(req.body.endpoint){
@@ -33,6 +33,10 @@ router.post('/login', async function (req, res) {
             else
                 res.status(500).json({status: 'negative',message:"아직 승인처리되지 않은 아이디입니다. 관리자에게 문의해주세요."});
         }
+    }).catch(err=>{
+            console.error('로그인 에러:', err);
+            res.status(401).json({status: 'error', message: "비밀번호 및 아이디를 확인해주세요."});
+
     });
 });
 
