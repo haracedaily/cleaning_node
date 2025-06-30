@@ -14,10 +14,10 @@ router.get('/',async function (req, res) {
 
     let prevMonth = new Date(today.getFullYear(), today.getMonth()-1, 1);
     const month_start = prevMonth.toISOString().slice(0,8)+'01T00:00:00Z';
-    const month_last = new Date(today.getFullYear(), today.getMonth(), 0).toISOString().slice(0,10)+'T23:59:59Z';
+    const month_last = new Date(today.getFullYear(), today.getMonth()-1, 0).toISOString().slice(0,10)+'T23:59:59Z';
 
     const {data:payData,error:payError} = await supa.from('reservation').select('price.sum()').gte('state',5).neq('state',6).gte('date',month_start).lte('date',month_last);
-    console.log(payData);
+    console.log("정산 합계 : ",payData);
     if(!payError)
     req.session.payed = payData[0].sum? parseInt(payData[0].sum*0.7).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') : 0;
     else
@@ -30,9 +30,12 @@ router.get('/',async function (req, res) {
         .gte('date', start)
         .lte('date', end)
         .order('state', { ascending: true }).order('date', { ascending: false });
-
+    console.log("검색 기간 : ",month_start,month_last,prevMonth);
+    console.log("말일 기간 : ",new Date(today.getFullYear(), today.getMonth()-1, 0));
+    console.log("today 값 : ",today);
+    console.log("today 달 출력 : ", today.getMonth());
+    console.log("지난달 말일? : ",new Date(today.getFullYear(), today.getMonth(), 0));
     console.log("today : ",data);
-
     console.log(req.session);
     if(!error){
 
@@ -154,6 +157,13 @@ router.post('/pick',async function (req, res) {
         }
     }
     console.log("픽업 결과 : ",result);
+    const offset = new Date().getTimezoneOffset() * 60000;
+
+    const today = new Date(Date.now() - offset); // 예: 2025‑06‑19T...
+    const dateOnly = today.toISOString().slice(0,10);
+    if(result.data[0]?.date.slice(0,10)===dateOnly) {
+        req.session.objCnt[1]+=1;
+    }
     res.send(result);
 })
 
