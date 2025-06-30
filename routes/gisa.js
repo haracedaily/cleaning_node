@@ -12,7 +12,7 @@ router.get('/',async function (req, res) {
     const start = dateOnly + 'T00:00:00Z';
     const end   = dateOnly + 'T23:59:59Z';
 
-    let prevMonth = new Date(today.getFullYear(), today.getMonth()-1, 1);
+    let prevMonth = new Date(today.getFullYear(), today.getMonth()-1, 0);
     const month_start = prevMonth.toISOString().slice(0,8)+'01T00:00:00Z';
     const month_last = new Date(today.getFullYear(), today.getMonth()-1, 0).toISOString().slice(0,10)+'T23:59:59Z';
 
@@ -31,9 +31,17 @@ router.get('/',async function (req, res) {
         .lte('date', end)
         .order('state', { ascending: true }).order('date', { ascending: false });
     console.log("검색 기간 : ",month_start,month_last,prevMonth);
+    console.log("지난달 기반 : ",prevMonth);
     console.log("말일 기간 : ",new Date(today.getFullYear(), today.getMonth()-1, 0));
+    console.log("???시작 기간 : ",new Date(today.getFullYear(), today.getMonth()-1, 1));
     console.log("today 값 : ",today);
     console.log("today 달 출력 : ", today.getMonth());
+    console.log("today 달 -1 출력 : ", today.getMonth()-1);
+    console.log("new 생성자로 달 출력 : ",new Date().getMonth());
+    console.log("new 생성자 : ",new Date());
+    console.log("offset제거 : ",new Date(Date.now() - offset));
+    console.log("offset제거 달 출력 : ",new Date(Date.now() - offset).getMonth());
+    console.log("??:",today.toISOString().slice(5,7));
     console.log("지난달 말일? : ",new Date(today.getFullYear(), today.getMonth(), 0));
     console.log("today : ",data);
     console.log(req.session);
