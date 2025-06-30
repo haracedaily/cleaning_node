@@ -12,9 +12,9 @@ router.get('/',async function (req, res) {
     const start = dateOnly + 'T00:00:00Z';
     const end   = dateOnly + 'T23:59:59Z';
 
-    let prevMonth = new Date(today.getFullYear(), today.getMonth()-1, 0);
+    let prevMonth = new Date(today.getFullYear(), today.getMonth(), 0);
     const month_start = prevMonth.toISOString().slice(0,8)+'01T00:00:00Z';
-    const month_last = new Date(today.getFullYear(), today.getMonth()-1, 0).toISOString().slice(0,10)+'T23:59:59Z';
+    const month_last = new Date(today.getFullYear(), today.getMonth(), 0).toISOString().slice(0,10)+'T23:59:59Z';
 
     const {data:payData,error:payError} = await supa.from('reservation').select('price.sum()').gte('state',5).neq('state',6).gte('date',month_start).lte('date',month_last);
     console.log("정산 합계 : ",payData);
