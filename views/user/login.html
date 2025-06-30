@@ -87,7 +87,10 @@
 
         const $pw = document.getElementById('pw');
         const $id = document.getElementById('id');
+        const $loginBtn = document.getElementById('loginBtn');
         document.getElementById('loginBtn').addEventListener("click", () => {
+            console.log(this);
+            $loginBtn.disabled = true;
             let subscription = _pushSubscription;
             let pushData = {};
             if (subscription) {
@@ -149,6 +152,8 @@
                     showConfirmButton: false,
                     timer: 1000
                 });
+            }).finally(()=>{
+                $loginBtn.disabled = false;
             });
         });
     </script>
