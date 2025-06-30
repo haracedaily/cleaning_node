@@ -63,8 +63,7 @@
     async function setupChannel() {
         const channel = supa
             .channel('res-db-changes')
-            .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'reservation' }, payload => {
-                console.log(payload);
+            .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'reservation' }, (payload) => {
                 if(payload.new.state!==3){
                         if(document.getElementById("res"+payload.new.res_no)){
                             //이부분 고민해보기 예약 건수 자체가 적어서 지금은 기괴함
