@@ -86,7 +86,7 @@ router.get('/history',async function (req, res) {
     if(!req.session.user) return res.redirect('/');
     const month = req.query?.month || new Date().getMonth()+1;
     const offset = new Date().getTimezoneOffset() * 60000;
-    const today = new Date(Date.now() - offset);
+    const today = new Date(new Date(new Date().getFullYear(),month-1,3) - offset);
     // console.log(today.getMonth()+1, today.getDate(), today.getFullYear(),today.getUTCFullYear());
     // console.log(month);
     // console.log("오늘",new Date());
@@ -96,8 +96,7 @@ router.get('/history',async function (req, res) {
     if(!req.session?.user) res.redirect('/');
     const {data:history,error} = await supa.from('reservation').select('*,user:customer!user_email(email,name,phone,addr,image_url),work:ice_work!res_no(memo,images_url)').eq('state',5).eq('gisa_email',req.session.user.mail).gte('date',start).lte('date',last).order('date', { ascending: false });
     const {data:totalPrice,err} = await supa.from('reservation').select('price.sum()').eq('state',5).eq('gisa_email',req.session.user.mail).gte('date',start).lte('date',last);
-    console.log("해당 월의 총 금액",totalPrice[0]);
-    if(!error)
+    if(!error&&history?.length>0)
     res.render('history',{title: 'ICECARE', request: req, month,history,payment:parseInt(totalPrice[0].sum*0.7).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')});
     else
         res.render('history',{title: 'ICECARE', request: req, month,history:[],payment:0});
